@@ -103,11 +103,13 @@ class Memory:
                 # Convert data to array
                 value = value if isinstance(value, ndarray) else array(value)
 
-                # Update the shared array
-                self.__data[key][...] = value[...]
+                if not (self.__data[key][...] == value[...]).all():
 
-                # Turn the associated dirty flag to True
-                self.__dirty[key][...] = True
+                    # Update the shared array
+                    self.__data[key][...] = value[...]
+
+                    # Turn the associated dirty flag to True
+                    self.__dirty[key][...] = True
 
     def close(self) -> None:
         """

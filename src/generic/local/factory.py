@@ -3,6 +3,7 @@ from socket import socket, AF_INET, SOCK_STREAM, SOL_SOCKET, SO_REUSEADDR
 from multiprocessing.shared_memory import SharedMemory
 from time import sleep
 from numpy import array, ndarray, nan
+from vedo import get_color
 
 from SimRender.generic.local.memory import Memory
 from SimRender.generic.utils import flat_mesh_cells
@@ -143,6 +144,10 @@ class Objects:
 
         # The call to locals() in the add_ methods also includes the 'self' key
         del data['self']
+
+        # Convert color to RGB values
+        if isinstance(data['color'], str):
+            data['color'] = get_color(data['color'])
 
         # Create a new memory for the visual object
         self.__factory.memories.append(Memory(object_type=object_type, data=data))

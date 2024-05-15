@@ -12,12 +12,13 @@ class Viewer:
     def __init__(self, sync: bool = False):
         """
         This class manages a single remote viewer to render visual objects.
+
         :param sync: If True, the rendering step will block the python code execution. Otherwise, the viewer will only
         render the current status of the simulation. Use it if you want to make sure that all your simulation steps are
         rendered.
         """
 
-        # Create a Factory to manage visual object and remote communication
+        # Create a Factory to manage visual objects and remote communication
         self.__factory = Factory(sync=sync)
         self.__subprocess: Optional[Thread] = None
 

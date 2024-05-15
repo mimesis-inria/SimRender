@@ -5,6 +5,9 @@ from vedo import Mesh
 from SimRender.generic import Viewer
 
 
+file = lambda f: join(dirname(__file__), 'data', f)
+
+
 class Simulation:
 
     def __init__(self):
@@ -14,7 +17,6 @@ class Simulation:
         """
 
         self.step_id = 0
-        file = lambda f: join(dirname(__file__), 'data', f)
 
         # Load the heart data (mesh, recorded positions, displacement)
         self.heart_mesh = Mesh(inputobj=file('heart.obj'))
@@ -82,6 +84,9 @@ class Simulation:
 
 if __name__ == '__main__':
 
+    from time import time
+    from numpy import array
+
     # Create the simulation
     simu = Simulation()
 
@@ -89,8 +94,12 @@ if __name__ == '__main__':
     simu.init_viewer()
 
     # Run some steps of the simulation
+    T = []
     for i in range(500):
+        st = time()
         simu.step()
+        T.append(time() - st)
+    print(array(T).mean())
 
     # Close the simulation
     simu.close()

@@ -162,7 +162,7 @@ class Object:
 
         # Create instance
         self.object = Mesh(inputobj=[data['positions'], cells],
-                           c=data['color'].item(), alpha=data['alpha'].item())
+                           c=data['color'], alpha=data['alpha'].item())
         self.object.wireframe(value=data['wireframe'].item()).lw(linewidth=data['line_width'].item())
 
         # Apply cmap
@@ -191,7 +191,7 @@ class Object:
         # Update color
         color, dirty = self.__memory.get_data(field_name='color')
         if dirty:
-            self.object.color(color.item())
+            self.object.color(color)
         alpha, dirty = self.__memory.get_data(field_name='alpha')
         if dirty:
             self.object.alpha(alpha.item())
