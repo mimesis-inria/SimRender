@@ -170,6 +170,10 @@ class Objects:
         del data['self']
         object_id = data.pop('object_id')
 
+        # Convert color to RGB values
+        if isinstance(data['color'], str):
+            data['color'] = get_color(data['color'])
+
         # Check that the update_ method is called for the good visual object type
         self.__check_id(object_id=object_id, object_type=object_type)
 
@@ -197,7 +201,9 @@ class Objects:
                  line_width: float = 1.,
                  colormap: str = 'jet',
                  colormap_field: ndarray = array(nan),
-                 colormap_range: ndarray = array(nan)) -> int:
+                 colormap_range: ndarray = array(nan),
+                 texture_name: str = '',
+                 texture_coords: ndarray = array(nan)) -> int:
         """
         Add a new mesh in the viewer.
 
@@ -210,6 +216,8 @@ class Objects:
         :param colormap: Color map scheme name.
         :param colormap_field: Scalar values to color the mesh regarding the colormap.
         :param colormap_range: Range of the color map.
+        :param texture_name: Name of the texture file.
+        :param texture_coords: Texture coordinates.
         :return: ID of the object in the viewer.
         """
 

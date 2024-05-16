@@ -25,11 +25,75 @@ class OglModel(Mesh):
         color = material.split('Diffuse')[1].split('Ambient')[0].split(' ')[2:-1]
         self.alpha = max(0.1, float(color[-1]))
         self.color = [float(c) for c in color[:-1]]
+        # Wireframe & line width
+        self.wireframe = False
+        self.line_width = 0
+        # Texture
+        self.texture_name = self.sofa_object.getData('texturename').value
+        self.texture_coords = self.sofa_object.getData('texcoords').value
         return super().create()
 
     def update(self) -> Dict[str, Any]:
 
         # Position
         self.positions = self.sofa_object.getData('position').value
+        # Color & alpha
+        material = self.sofa_object.getData('material').value
+        color = material.split('Diffuse')[1].split('Ambient')[0].split(' ')[2:-1]
+        self.alpha = max(0.1, float(color[-1]))
+        self.color = [float(c) for c in color[:-1]]
+        return super().update()
 
+
+class TriangleCollisionModel(Mesh):
+
+    def __init__(self, sofa_object: Sofa.Core.Object):
+
+        super().__init__(sofa_object=sofa_object)
+
+    def create(self) -> Dict[str, Any]:
+
+        # Position
+        self.positions = self.sofa_node.findLink('state').getLinkedBase().getData('position').value
+        # Cells
+        self.cells = self.sofa_object.findLink('topology').getLinkedBase().getData('triangles').value
+        # Color & alpha
+        self.alpha = 1.
+        self.color = 'orange5'
+        # Wireframe & line width
+        self.wireframe = True
+        self.line_width = 2
+        return super().create()
+
+    def update(self) -> Dict[str, Any]:
+
+        # Position
+        self.positions = self.sofa_node.findLink('state').getLinkedBase().getData('position').value
+        return super().update()
+
+
+class LineCollisionModel(Mesh):
+
+    def __init__(self, sofa_object: Sofa.Core.Object):
+
+        super().__init__(sofa_object=sofa_object)
+
+    def create(self) -> Dict[str, Any]:
+
+        # Position
+        self.positions = self.sofa_node.findLink('state').getLinkedBase().getData('position').value
+        # Cells
+        self.cells = self.sofa_object.findLink('topology').getLinkedBase().getData('triangles').value
+        # Color & alpha
+        self.alpha = 1.
+        self.color = 'orange5'
+        # Wireframe & line width
+        self.wireframe = True
+        self.line_width = 2
+        return super().create()
+
+    def update(self) -> Dict[str, Any]:
+
+        # Position
+        self.positions = self.sofa_node.findLink('state').getLinkedBase().getData('position').value
         return super().update()

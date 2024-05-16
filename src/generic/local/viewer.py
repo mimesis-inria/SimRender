@@ -21,6 +21,7 @@ class Viewer:
         # Create a Factory to manage visual objects and remote communication
         self.__factory = Factory(sync=sync)
         self.__subprocess: Optional[Thread] = None
+        self.__remote_viewer = viewer.__file__
 
     @property
     def objects(self) -> Objects:
@@ -36,7 +37,7 @@ class Viewer:
         """
 
         def __launch(port: int):
-            run([executable, viewer.__file__, str(port)])
+            run([executable, self.__remote_viewer, str(port)])
 
         # Init the local factory connection
         socket_port = self.__factory.init()

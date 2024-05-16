@@ -50,43 +50,40 @@ class Objects(_Objects):
     #  (shared method for each object type, only check a variety of fields, then only add in
     #  OBJECTS the lists of object nams for each category)
 
-    def add_sofa_mesh(self,
-                      positions_data: Sofa.Core.Data,
-                      cells_data: Union[Sofa.Core.Data, List[Sofa.Core.Data]],
-                      animated: bool = True) -> int:
-
-        # Positions data
-        positions = positions_data.array()
-        if len(positions) == 0:
-            raise ValueError(f"Data contains an empty positions array.")
-
-        # Cells data
-        cells = []
-        cells_data = [cells_data] if not isinstance(cells_data, list) else cells_data
-        for data in cells_data:
-            if len(data.array()) > 0:
-                cells += data.array().tolist()
-        if len(cells) == 0:
-            raise ValueError(f"Data contains empty topology arrays.")
-
-        # Add the mesh
-        idx = self.add_mesh(positions=positions,
-                            cells=cells)
-        if animated:
-            self.__factory.callbacks.append([self.__update_sofa_mesh,
-                                             {'object_id': idx,
-                                              'positions_data': positions_data}])
-        return idx
-
-    def __update_sofa_mesh(self,
-                           object_id: int,
-                           positions_data: Sofa.Core.Data):
-
-        self.update_mesh(object_id=object_id,
-                         positions=positions_data.array())
-
-
-
+    # def add_sofa_mesh(self,
+    #                   positions_data: Sofa.Core.Data,
+    #                   cells_data: Union[Sofa.Core.Data, List[Sofa.Core.Data]],
+    #                   animated: bool = True) -> int:
+    #
+    #     # Positions data
+    #     positions = positions_data.array()
+    #     if len(positions) == 0:
+    #         raise ValueError(f"Data contains an empty positions array.")
+    #
+    #     # Cells data
+    #     cells = []
+    #     cells_data = [cells_data] if not isinstance(cells_data, list) else cells_data
+    #     for data in cells_data:
+    #         if len(data.array()) > 0:
+    #             cells += data.array().tolist()
+    #     if len(cells) == 0:
+    #         raise ValueError(f"Data contains empty topology arrays.")
+    #
+    #     # Add the mesh
+    #     idx = self.add_mesh(positions=positions,
+    #                         cells=cells)
+    #     if animated:
+    #         self.__factory.callbacks.append([self.__update_sofa_mesh,
+    #                                          {'object_id': idx,
+    #                                           'positions_data': positions_data}])
+    #     return idx
+    #
+    # def __update_sofa_mesh(self,
+    #                        object_id: int,
+    #                        positions_data: Sofa.Core.Data):
+    #
+    #     self.update_mesh(object_id=object_id,
+    #                      positions=positions_data.array())
 
     def add_scene_graph(self) -> None:
         """
@@ -95,8 +92,6 @@ class Objects(_Objects):
 
         # Process each sofa object in the scene graph
         for key, sofa_object in self.__scene_graph.graph.items():
-
-
 
             # Key format: root.child1...childN.@.Component<name>
             object_class = key.split('@.')[1].split('<')[0]
@@ -107,11 +102,6 @@ class Objects(_Objects):
                 # TODO: apply the display flags
 
             # Check if a configuration exists for the object
-            # elif object_type in OBJECTS.keys():
-            #     container: Base = OBJECTS[object_type]()
-            #     print(container.create(sofa_object))
-            #     container = OBJECTS[object_type](sofa_object=sofa_object)
-            #     visual_object_type, visual_object_data = container.create()
             elif object_class in SOFA_OBJECTS:
                 data_wrapper = SOFA_OBJECTS[object_class](sofa_object=sofa_object)
                 func = self.__getattribute__(f'add_{data_wrapper.object_type}')

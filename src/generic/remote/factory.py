@@ -176,6 +176,10 @@ class Object:
                 self.object.cmap(input_cmap=data['colormap'].item(),
                                  input_array=data['colormap_field'])
 
+        # Apply texture
+        elif not isnan(data['texture_coords']).any() and data['texture_name'].item() != '':
+            self.object.texture(tname=data['texture_name'].item(), tcoords=data['texture_coords'])
+
     def _update_mesh(self) -> None:
         """
         Update a mesh instance.

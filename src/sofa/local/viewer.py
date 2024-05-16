@@ -4,6 +4,7 @@ import Sofa
 
 from SimRender.generic.local.viewer import Viewer as _Viewer
 from SimRender.sofa.local.factory import Factory, Objects
+from SimRender.sofa.remote import viewer
 
 
 class Viewer(_Viewer):
@@ -21,6 +22,7 @@ class Viewer(_Viewer):
         # Create a Factory to manage visual objects and remote communication
         self.__factory = Factory(root_node=root_node, sync=sync)
         self.__subprocess: Optional[Thread] = None
+        self.__remote_viewer = viewer.__file__
 
     @property
     def objects(self) -> Objects:
