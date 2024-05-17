@@ -161,20 +161,16 @@ class Object:
         cells = data['cells'] if len(data['cells'].shape) > 1 else get_mesh_cells(flat_cells=data['cells'])
 
         # Create instance
-        self.object = Mesh(inputobj=[data['positions'], cells],
-                           c=data['color'], alpha=data['alpha'].item())
+        self.object = Mesh(inputobj=[data['positions'], cells], c=data['color'], alpha=data['alpha'].item())
         self.object.wireframe(value=data['wireframe'].item()).lw(linewidth=data['line_width'].item())
 
         # Apply cmap
         if not isnan(data['colormap_field']).any():
             if not isnan(data['colormap_range']).any():
-                self.object.cmap(input_cmap=data['colormap'].item(),
-                                 input_array=data['colormap_field'],
-                                 vmin=data['colormap_range'][0],
-                                 vmax=data['colormap_range'][1])
+                self.object.cmap(input_cmap=data['colormap'].item(), input_array=data['colormap_field'],
+                                 vmin=data['colormap_range'][0], vmax=data['colormap_range'][1])
             else:
-                self.object.cmap(input_cmap=data['colormap'].item(),
-                                 input_array=data['colormap_field'])
+                self.object.cmap(input_cmap=data['colormap'].item(), input_array=data['colormap_field'])
 
         # Apply texture
         elif not isnan(data['texture_coords']).any() and data['texture_name'].item() != '':
@@ -204,10 +200,8 @@ class Object:
             colormap, _ = self.__memory.get_data(field_name='colormap')
             colormap_range, _ = self.__memory.get_data(field_name='colormap_range')
             if not isnan(colormap_range).any():
-                self.object.cmap(input_cmap=colormap.item(),
-                                 input_array=colormap_field,
-                                 vmin=colormap_range[0],
-                                 vmax=colormap_range[1])
+                self.object.cmap(input_cmap=colormap.item(), input_array=colormap_field,
+                                 vmin=colormap_range[0], vmax=colormap_range[1])
             else:
                 self.object.cmap(input_cmap=colormap.item(), input_array=colormap_field)
 
@@ -224,11 +218,51 @@ class Object:
         Create a point cloud instance.
         """
 
-        pass
+        # Access data fields
+        data = self.__memory.data
+
+        # Create instance
+        self.object = Points(inputobj=data['positions'], r=data['point_size'].item(),
+                             c=data['color'], alpha=data['alpha'].item())
+
+        # Apply cmap
+        if not isnan(data['colormap_field']).any():
+            if not isnan(data['colormap_range']).any():
+                self.object.cmap(input_cmap=data['colormap'].item(), input_array=data['colormap_field'],
+                                 vmin=data['colormap_range'][0], vmax=data['colormap_range'][1])
+            else:
+                self.object.cmap(input_cmap=data['colormap'].item(), input_array=data['colormap_field'])
 
     def _update_points(self):
         """
         Update a point cloud instance.
         """
 
-        pass
+        self.object: Points
+
+        # Update positions
+        positions, dirty = self.__memory.get_data(field_name='positions')
+        if dirty:
+            self.object.vertices = positions
+
+        # Update color
+        color, dirty = self.__memory.get_data(field_name='color')
+        if dirty:
+            self.object.color(color)
+        alpha, dirty = self.__memory.get_data(field_name='alpha')
+        if dirty:
+            self.object.alpha(alpha.item())
+        colormap_field, dirty = self.__memory.get_data(field_name='colormap_field')
+        if dirty:
+            colormap, _ = self.__memory.get_data(field_name='colormap')
+            colormap_range, _ = self.__memory.get_data(field_name='colormap_range')
+            if not isnan(colormap_range).any():
+                self.object.cmap(input_cmap=colormap.item(), input_array=colormap_field,
+                                 vmin=colormap_range[0], vmax=colormap_range[1])
+            else:
+                self.object.cmap(input_cmap=colormap.item(), input_array=colormap_field)
+
+        # Update rendering style
+        point_size, dirty = self.__memory.get_data(field_name='point_size')
+        if dirty:
+            self.object.point_size(point_size.item())

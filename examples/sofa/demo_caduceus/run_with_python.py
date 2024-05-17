@@ -14,7 +14,7 @@ if __name__ == '__main__':
     Sofa.Simulation.init(root)
 
     # VIEWER: create and start the rendering
-    viewer = Viewer(root_node=root, sync=True)
+    viewer = Viewer(root_node=root, sync=False)
     viewer.objects.add_scene_graph()
     viewer.launch()
 

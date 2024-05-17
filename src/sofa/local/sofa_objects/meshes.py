@@ -83,7 +83,7 @@ class LineCollisionModel(Mesh):
         # Position
         self.positions = self.sofa_node.findLink('state').getLinkedBase().getData('position').value
         # Cells
-        self.cells = self.sofa_object.findLink('topology').getLinkedBase().getData('triangles').value
+        self.cells = self.sofa_object.findLink('topology').getLinkedBase().getData('edges').value
         # Color & alpha
         self.alpha = 1.
         self.color = 'orange5'

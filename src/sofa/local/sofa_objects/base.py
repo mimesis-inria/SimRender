@@ -51,3 +51,31 @@ class Mesh(Base):
                'color': self.color,
                'alpha': self.alpha}
         return {key: value for key, value in res.items() if value is not None}
+
+
+class Points(Base):
+
+    def __init__(self, sofa_object: Sofa.Core.Object):
+
+        super().__init__(sofa_object=sofa_object)
+
+        self.object_type = 'points'
+        self.positions: Optional[Any] = None
+        self.color: Optional[Any] = None
+        self.alpha: Optional[Any] = None
+        self.point_size: Optional[Any] = None
+
+    def create(self) -> Dict[str, Any]:
+
+        res = {'positions': self.positions,
+               'color': self.color,
+               'alpha': self.alpha,
+               'point_size': self.point_size}
+        return {key: value for key, value in res.items() if value is not None}
+
+    def update(self) -> Dict[str, Any]:
+
+        res = {'positions': self.positions,
+               'color': self.color,
+               'alpha': self.alpha}
+        return {key: value for key, value in res.items() if value is not None}
