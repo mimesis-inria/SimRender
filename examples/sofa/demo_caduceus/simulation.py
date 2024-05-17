@@ -15,7 +15,6 @@ class Simulation(Sofa.Core.Controller):
         Sofa.Core.Controller.__init__(self, name='PyController', *args, **kwargs)
 
         self.root = root
-        self.idx_step = 0
         self.create_graph()
 
     def create_graph(self) -> None:

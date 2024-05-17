@@ -3,7 +3,6 @@ from socket import socket, AF_INET, SOCK_STREAM, SOL_SOCKET, SO_REUSEADDR
 from multiprocessing.shared_memory import SharedMemory
 from time import sleep
 from numpy import array, ndarray, nan
-from vedo import get_color
 
 from SimRender.generic.local.memory import Memory
 from SimRender.generic.utils import flat_mesh_cells
@@ -145,10 +144,6 @@ class Objects:
         # The call to locals() in the add_ methods also includes the 'self' key
         del data['self']
 
-        # Convert color to RGB values
-        if isinstance(data['color'], str):
-            data['color'] = get_color(data['color'])
-
         # Create a new memory for the visual object
         self.__factory.memories.append(Memory(object_type=object_type, data=data))
 
@@ -169,10 +164,6 @@ class Objects:
         # The call to locals() in the update_ methods also includes 'self' and 'object_id' keys
         del data['self']
         object_id = data.pop('object_id')
-
-        # Convert color to RGB values
-        if isinstance(data['color'], str):
-            data['color'] = get_color(data['color'])
 
         # Check that the update_ method is called for the good visual object type
         self.__check_id(object_id=object_id, object_type=object_type)
@@ -278,7 +269,7 @@ class Objects:
                       color: Optional[str] = None,
                       alpha: Optional[float] = None,
                       point_size: Optional[float] = None,
-                      scalar_field: Optional[ndarray] = None) -> None:
+                      colormap_field: Optional[ndarray] = None) -> None:
         """
         Update an existing point cloud in the viewer.
 
@@ -287,7 +278,50 @@ class Objects:
         :param color: Color of the point cloud.
         :param alpha: Opacity of the point cloud.
         :param point_size: Size of points.
-        :param scalar_field: Scalar values to color the point cloud regarding the colormap.
+        :param colormap_field: Scalar values to color the point cloud regarding the colormap.
         """
 
         self.__update_object(object_type='points', data=locals())
+
+    def add_arrows(self,
+                   positions: ndarray,
+                   vectors: ndarray,
+                   color: str = 'green',
+                   alpha: float = 1.,
+                   colormap: str = 'jet',
+                   colormap_field: ndarray = array(nan),
+                   colormap_range: ndarray = array(nan)) -> int:
+        """
+        Add a new point cloud in the viewer.
+
+        :param positions: Positions of the arrows bases.
+        :param vectors: Vectors of the arrows.
+        :param color: Color of the arrows.
+        :param alpha: Opacity of the arrows.
+        :param colormap: Color map scheme name.
+        :param colormap_field: Scalar values to color the point cloud regarding the colormap.
+        :param colormap_range: Range of the color map.
+        :return: ID of the object in the viewer.
+        """
+
+        return self.__add_object(object_type='arrows', data=locals())
+
+    def update_arrows(self,
+                      object_id: int,
+                      positions: Optional[ndarray] = None,
+                      vectors: Optional[ndarray] = None,
+                      color: Optional[str] = None,
+                      alpha: Optional[float] = None,
+                      colormap_field: Optional[ndarray] = None) -> None:
+        """
+        Update an existing point cloud in the viewer.
+
+        :param object_id: ID of the object as returned when created.
+        :param positions: Positions of the point cloud.
+        :param vectors: Vectors of the arrows.
+        :param color: Color of the point cloud.
+        :param alpha: Opacity of the point cloud.
+        :param colormap_field: Scalar values to color the point cloud regarding the colormap.
+        """
+
+        self.__update_object(object_type='arrows', data=locals())

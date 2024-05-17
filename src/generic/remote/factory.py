@@ -4,7 +4,9 @@ from threading import Thread
 from multiprocessing.shared_memory import SharedMemory
 from time import sleep
 from numpy import array, ndarray, isnan
-from vedo import Plotter, Mesh, Points
+from vedo import Plotter, Mesh, Points, Arrows
+from matplotlib.colors import Normalize
+from matplotlib.pyplot import get_cmap
 
 from SimRender.generic.remote.memory import Memory
 from SimRender.generic.utils import fix_memory_leak, get_mesh_cells
@@ -105,7 +107,7 @@ class Factory:
 
         # Update each visual object
         for o in self.__objects:
-            o.update()
+            o.update(plt=self.plt)
 
         # Notify the simulation process if the do_synchronize flag is turned on
         if self.__sync_arr[1] == 1:
@@ -161,7 +163,8 @@ class Object:
         cells = data['cells'] if len(data['cells'].shape) > 1 else get_mesh_cells(flat_cells=data['cells'])
 
         # Create instance
-        self.object = Mesh(inputobj=[data['positions'], cells], c=data['color'], alpha=data['alpha'].item())
+        color = data['color'].item() if len(data['color'].shape) == 0 else data['color']
+        self.object = Mesh(inputobj=[data['positions'], cells], c=color, alpha=data['alpha'].item())
         self.object.wireframe(value=data['wireframe'].item()).lw(linewidth=data['line_width'].item())
 
         # Apply cmap
@@ -176,7 +179,7 @@ class Object:
         elif not isnan(data['texture_coords']).any() and data['texture_name'].item() != '':
             self.object.texture(tname=data['texture_name'].item(), tcoords=data['texture_coords'])
 
-    def _update_mesh(self) -> None:
+    def _update_mesh(self, plt: Plotter) -> None:
         """
         Update a mesh instance.
         """
@@ -190,6 +193,7 @@ class Object:
 
         # Update color
         color, dirty = self.__memory.get_data(field_name='color')
+        color = color.item() if len(color.shape) == 0 else color
         if dirty:
             self.object.color(color)
         alpha, dirty = self.__memory.get_data(field_name='alpha')
@@ -222,8 +226,9 @@ class Object:
         data = self.__memory.data
 
         # Create instance
+        color = data['color'].item() if len(data['color'].shape) == 0 else data['color']
         self.object = Points(inputobj=data['positions'], r=data['point_size'].item(),
-                             c=data['color'], alpha=data['alpha'].item())
+                             c=color, alpha=data['alpha'].item())
 
         # Apply cmap
         if not isnan(data['colormap_field']).any():
@@ -233,7 +238,7 @@ class Object:
             else:
                 self.object.cmap(input_cmap=data['colormap'].item(), input_array=data['colormap_field'])
 
-    def _update_points(self):
+    def _update_points(self, plt: Plotter):
         """
         Update a point cloud instance.
         """
@@ -247,6 +252,7 @@ class Object:
 
         # Update color
         color, dirty = self.__memory.get_data(field_name='color')
+        color = color.item() if len(color.shape) == 0 else color
         if dirty:
             self.object.color(color)
         alpha, dirty = self.__memory.get_data(field_name='alpha')
@@ -266,3 +272,59 @@ class Object:
         point_size, dirty = self.__memory.get_data(field_name='point_size')
         if dirty:
             self.object.point_size(point_size.item())
+
+    def _create_arrows(self) -> None:
+        """
+        Create an arrows instance.
+        """
+
+        # Access data fields
+        data = self.__memory.data
+
+        # Create instance
+        color = data['color'].item() if len(data['color'].shape) == 0 else data['color']
+        self.object = Arrows(start_pts=data['positions'], end_pts=data['positions'] + data['vectors'],
+                             c=color, alpha=data['alpha'].item())
+
+        # Apply cmap
+        if not isnan(data['colormap_field']).any():
+            if not isnan(data['colormap_range']).any():
+                cmap_norm = Normalize(vmin=float(data['colormap_range'][0]), vmax=float(data['colormap_range'][1]))
+            else:
+                cmap_norm = Normalize(vmin=min(data['colormap_field']), vmax=max(data['colormap_field']))
+            cmap = get_cmap(data['colormap'].item())
+            self.object.color(c=cmap(cmap_norm(data['colormap_field']))[:, :3])
+
+    def _update_arrows(self, plt: Plotter):
+        """
+        Update an arrows instance.
+        """
+
+        self.object: Arrows
+
+        # Update positions & vectors
+        positions, dirty_p = self.__memory.get_data(field_name='positions')
+        vectors, dirty_v = self.__memory.get_data(field_name='vectors')
+        if dirty_p or dirty_v:
+            plt.remove(self.object)
+            self._create_arrows()
+            plt.add(self.object)
+
+        # Update color
+        color, dirty = self.__memory.get_data(field_name='color')
+        color = color.item() if len(color.shape) == 0 else color
+        if dirty:
+            self.object.color(color)
+        alpha, dirty = self.__memory.get_data(field_name='alpha')
+        if dirty:
+            self.object.alpha(alpha.item())
+        colormap_field, dirty = self.__memory.get_data(field_name='colormap_field')
+        if dirty:
+
+            if not isnan(self.__memory.data['colormap_range']).any():
+                cmap_norm = Normalize(vmin=float(self.__memory.data['colormap_range'][0]),
+                                      vmax=float(self.__memory.data['colormap_range'][1]))
+            else:
+                cmap_norm = Normalize(vmin=min(colormap_field), vmax=max(colormap_field))
+            cmap = get_cmap(self.__memory.data['colormap'].item())
+            self.object.color(c=cmap(cmap_norm(colormap_field))[:, :3])

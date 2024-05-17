@@ -54,7 +54,7 @@ class TriangleCollisionModel(Mesh):
     def create(self) -> Dict[str, Any]:
 
         # Position
-        self.positions = self.sofa_node.findLink('state').getLinkedBase().getData('position').value
+        self.positions = self.sofa_node.getMechanicalState().getData('position').value
         # Cells
         self.cells = self.sofa_object.findLink('topology').getLinkedBase().getData('triangles').value
         # Color & alpha
@@ -68,7 +68,7 @@ class TriangleCollisionModel(Mesh):
     def update(self) -> Dict[str, Any]:
 
         # Position
-        self.positions = self.sofa_node.findLink('state').getLinkedBase().getData('position').value
+        self.positions = self.sofa_node.getMechanicalState().getData('position').value
         return super().update()
 
 
@@ -81,7 +81,7 @@ class LineCollisionModel(Mesh):
     def create(self) -> Dict[str, Any]:
 
         # Position
-        self.positions = self.sofa_node.findLink('state').getLinkedBase().getData('position').value
+        self.positions = self.sofa_node.getMechanicalState().getData('position').value
         # Cells
         self.cells = self.sofa_object.findLink('topology').getLinkedBase().getData('edges').value
         # Color & alpha
@@ -95,5 +95,5 @@ class LineCollisionModel(Mesh):
     def update(self) -> Dict[str, Any]:
 
         # Position
-        self.positions = self.sofa_node.findLink('state').getLinkedBase().getData('position').value
+        self.positions = self.sofa_node.getMechanicalState().getData('position').value
         return super().update()

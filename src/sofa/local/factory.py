@@ -23,8 +23,6 @@ class Factory(_Factory):
 
     def update(self) -> None:
 
-        # for (func, kwargs) in self.callbacks:
-        #     func(**kwargs)
         for idx, data_wrapper in self.callbacks.items():
             func = self.objects.__getattribute__(f'update_{data_wrapper.object_type}')
             func(idx, **data_wrapper.update())
