@@ -5,7 +5,7 @@ from SimRender.generic.remote.factory import Factory
 
 class Viewer(Plotter):
 
-    def __init__(self, socket_port: int):
+    def __init__(self, socket_port: int, *args, **kwargs):
         """
         Viewer to render visual objects.
 
@@ -13,7 +13,7 @@ class Viewer(Plotter):
         """
 
         # Init the Plotter as interactive
-        super().__init__(interactive=True)
+        super().__init__(interactive=True, *args, **kwargs)
 
         # Create a Factory to recover the visual objects from the simulation process
         self.factory = Factory(socket_port=socket_port, plotter=self)
@@ -30,6 +30,8 @@ class Viewer(Plotter):
         self.add_callback(event_name='timer', func=self.time_step, enable_picking=True)
         self.timer_id = self.timer_callback(action='create', dt=1)
         self.count = 0
+
+    def launch(self):
 
         # Launch the visualization window
         self.factory.listen()
@@ -70,4 +72,4 @@ if __name__ == '__main__':
 
     # Executed code when the visualization process is launched
     from sys import argv
-    Viewer(socket_port=int(argv[1]))
+    Viewer(socket_port=int(argv[1])).launch()
