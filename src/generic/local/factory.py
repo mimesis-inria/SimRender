@@ -37,15 +37,19 @@ class Factory:
         self.__sync_arr = ndarray(shape=sync_array.shape, dtype=sync_array.dtype, buffer=self.__sync_sm.buf)
         self.__sync_arr[...] = sync_array[...]
 
-    def init(self) -> int:
+    def init(self, batch_key: Optional[int]) -> int:
         """
         Initialize the local socket.
 
         :return: Available port number of the socket.
         """
 
-        # Get an available socket port
-        self.__socket.bind(('localhost', 0))
+        # Case 1: Non-batch mode, get an available socket port
+        if batch_key is None:
+            self.__socket.bind(('localhost', 0))
+        # Case 2: Batch mode, bind to the defined key
+        else:
+            self.__socket.bind(('localhost', batch_key))
         return self.__socket.getsockname()[1]
 
     def connect(self) -> None:

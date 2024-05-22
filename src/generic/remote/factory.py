@@ -26,10 +26,16 @@ class Factory:
         # CPython issue: https://github.com/python/cpython/issues/82300
         fix_memory_leak()
 
-        # Connect to the simulation process
+        # Connect to the simulation process (possibly wait for the server to bind to the defined address)
         self.__socket = socket(AF_INET, SOCK_STREAM)
         self.__socket.setsockopt(SOL_SOCKET, SO_REUSEADDR, 1)
-        self.__socket.connect(('localhost', socket_port))
+        connected = False
+        while not connected:
+            try:
+                self.__socket.connect(('localhost', socket_port))
+                connected = True
+            except ConnectionRefusedError:
+                pass
 
         # Load the shared numpy array for synchronization with format [do_exit, do_synchronize, step_counter]
         sync_array = array([0, 0, 0], dtype=int)
@@ -57,6 +63,7 @@ class Factory:
 
         # Plotter instance
         self.plt = plotter
+        self.active = True
 
     @property
     def vedo_objects(self) -> List[Points]:

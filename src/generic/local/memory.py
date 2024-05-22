@@ -29,11 +29,6 @@ class Memory:
 
             # Convert data to array
             value = value if isinstance(value, ndarray) else array(value)
-            # if not isinstance(value, ndarray):
-            #     try:
-            #         value = array(value)
-            #     except ValueError:
-            #         value = array(value, dtype=object)
 
             # Dirty flag template
             dirty = array(0, dtype=bool)

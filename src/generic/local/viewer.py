@@ -31,7 +31,7 @@ class Viewer:
 
         return self.__factory.objects
 
-    def launch(self) -> None:
+    def launch(self, batch_key: Optional[int] = None) -> None:
         """
         Launch the rendering window in its own python process.
         """
@@ -40,10 +40,13 @@ class Viewer:
             run([executable, self.__remote_viewer, str(port)])
 
         # Init the local factory connection
-        socket_port = self.__factory.init()
-        # Launch the python process for the rendering window
-        self.__subprocess = Thread(target=__launch, args=(socket_port,), daemon=True)
-        self.__subprocess.start()
+        socket_port = self.__factory.init(batch_key=batch_key)
+
+        # In non-batch mode, launch the python process for the rendering window
+        if batch_key is None:
+            self.__subprocess = Thread(target=__launch, args=(socket_port,), daemon=True)
+            self.__subprocess.start()
+
         # Share data between local and remote factories
         self.__factory.connect()
 
@@ -62,5 +65,6 @@ class Viewer:
 
         # Close the connection between local and remote factories
         self.__factory.close()
-        # Stop the rendering python process
-        self.__subprocess.join()
+        # Stop the rendering python process in non-batch mode
+        if self.__subprocess is not None:
+            self.__subprocess.join()
