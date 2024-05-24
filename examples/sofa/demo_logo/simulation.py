@@ -1,6 +1,7 @@
-import Sofa
+from typing import Optional
 from os.path import join, dirname
 import numpy as np
+import Sofa
 
 
 file = lambda f: join(dirname(__file__), 'data', f)
@@ -8,7 +9,7 @@ file = lambda f: join(dirname(__file__), 'data', f)
 
 class Simulation(Sofa.Core.Controller):
 
-    def __init__(self, root: Sofa.Core.Node, *args, **kwargs):
+    def __init__(self, root: Sofa.Core.Node, id_simu: Optional[int] = None, *args, **kwargs):
         """
         Simulation of the SOFA logo.
         Forces and constraints positions can be manually set with the 'selections.py' script.
@@ -17,9 +18,9 @@ class Simulation(Sofa.Core.Controller):
         Sofa.Core.Controller.__init__(self, name='PyController', *args, **kwargs)
 
         self.root = root
-        self.create_graph()
+        self.create_graph(id_simu=id_simu)
 
-    def create_graph(self) -> None:
+    def create_graph(self, id_simu: Optional[int]) -> None:
 
         # Root
         self.root.dt.value = 0.1
@@ -71,8 +72,13 @@ class Simulation(Sofa.Core.Controller):
                     clusters.append([idx])
 
         # Create ForceFields
-        for i, cluster in enumerate(clusters):
-            self.root.logo.forces.addObject('ConstantForceField', name=f'cff_{i}', indices=cluster,
+        if id_simu is None:
+            for i, cluster in enumerate(clusters):
+                self.root.logo.forces.addObject('ConstantForceField', name=f'cff_{i}', indices=cluster,
+                                                forces=np.random.choice([-0.5, 0.5], (3,)), showArrowSize=1)
+        else:
+            id_simu = id_simu % len(clusters)
+            self.root.logo.forces.addObject('ConstantForceField', name='cff', indices=clusters[id_simu],
                                             forces=np.random.choice([-0.5, 0.5], (3,)), showArrowSize=1)
 
         self.root.logo.addChild('collision')

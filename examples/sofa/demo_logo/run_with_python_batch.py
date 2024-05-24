@@ -1,3 +1,4 @@
+from threading import Thread
 import Sofa
 
 from SimRender.generic import ViewerBatch
@@ -10,13 +11,13 @@ if __name__ == '__main__':
 
     # VIEWER: create and start the rendering
     batch = ViewerBatch()
-    nb_simu = 1
+    nb_simu = 4
     batch_keys = batch.start(nb_view=nb_simu)
 
     # SOFA: create and init the scene graph
     # VIEWER: associate a standard viewer for each simulation
     root = [Sofa.Core.Node() for _ in range(nb_simu)]
-    simu = [root[i].addObject(Simulation(root=root[i], idx=i)) for i in range(nb_simu)]
+    simu = [root[i].addObject(Simulation(root=root[i], id_simu=i)) for i in range(nb_simu)]
     view = [Viewer(root_node=root[i]) for i in range(nb_simu)]
     for i in range(nb_simu):
         Sofa.Simulation.init(root[i])
