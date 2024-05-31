@@ -49,6 +49,11 @@ class Factory:
             self.__socket.bind(('localhost', 0))
         # Case 2: Batch mode, bind to the defined key
         else:
+            # Disable sync for batch mode
+            if self.__sync_fct == self.__sync:
+                self.__sync_fct = lambda: sleep(0.002)
+                print('Warning: Synchronization is not available for Viewer in batch mode '
+                      '(automatically turned "sync" parameter to False)')
             self.__socket.bind(('localhost', batch_key))
         return self.__socket.getsockname()[1]
 
