@@ -1,10 +1,9 @@
-from threading import Thread
 import Sofa
 
 from SimRender.generic import ViewerBatch
 from SimRender.sofa import Viewer
 
-from simulation import Simulation
+from simulation_logo import Simulation
 
 
 if __name__ == '__main__':

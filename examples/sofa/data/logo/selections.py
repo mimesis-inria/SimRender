@@ -183,10 +183,10 @@ if __name__ == '__main__':
 
     for file in ['constraints', 'forces']:
 
-        if not exists(f := join('data', f'{file}.npy')):
+        if not exists(f := f'{file}.npy'):
             save(f, array([]))
 
-        plt = MeshSelector(mesh_file=join('data', 'volume.vtk'),
+        plt = MeshSelector(mesh_file='volume.vtk',
                            selection_file=f)
         plt.launch(title=f'{file}_selection')
         plt.save(overwrite=True)

@@ -2,7 +2,7 @@ import Sofa
 from os.path import join, dirname
 
 
-file = lambda f: join(dirname(__file__), 'data', f)
+file = lambda f: join(dirname(__file__), 'data', 'caduceus', f)
 
 
 class Simulation(Sofa.Core.Controller):
@@ -110,3 +110,26 @@ class Simulation(Sofa.Core.Controller):
         self.root.base.addChild('visual')
         self.root.base.visual.addObject('MeshOBJLoader', name='Base', filename=file('SOFA_pod.obj'))
         self.root.base.visual.addObject('OglModel', name='OglBase', src='@Base')
+
+
+def createScene(node):
+    node.addObject(Simulation(root=node))
+
+
+if __name__ == '__main__':
+
+    import Sofa.Gui
+    from os import listdir, remove
+
+    root = Sofa.Core.Node()
+    createScene(root)
+    Sofa.Simulation.init(root)
+
+    Sofa.Gui.GUIManager.Init(program_name="main", gui_name="qglviewer")
+    Sofa.Gui.GUIManager.createGUI(root, __file__)
+    Sofa.Gui.GUIManager.SetDimension(1200, 900)
+    Sofa.Gui.GUIManager.MainLoop(root)
+    Sofa.Gui.GUIManager.closeGUI()
+
+    for file in [f for f in listdir() if f.endswith('.ini') or f.endswith('.log')]:
+        remove(file)
