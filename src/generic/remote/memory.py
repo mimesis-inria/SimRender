@@ -1,4 +1,4 @@
-from typing import Optional, Dict, List, Tuple
+from typing import Dict, List, Tuple
 from socket import socket
 from multiprocessing.shared_memory import SharedMemory
 from numpy import array, ndarray, frombuffer, dtype as np_dtype
@@ -6,7 +6,7 @@ from numpy import array, ndarray, frombuffer, dtype as np_dtype
 
 class Memory:
 
-    def __init__(self, remote: socket):
+    def __init__(self, remote: socket, store_data: bool):
         """
         This class loads the shared arrays from the simulation process for each data field of a visual object.
 
@@ -45,24 +45,21 @@ class Memory:
             self.__data[field_name] = ndarray(shape=shape, dtype=dtype, buffer=value_sm.buf)
             self.__dirty[field_name] = ndarray(shape=dirty.shape, dtype=dirty.dtype, buffer=dirty_sm.buf)
 
-    @property
-    def data(self) -> Dict[str, ndarray]:
-        """
-        Visual object data dictionary access.
-        """
+        if store_data:
+            self.memory = {field_name: [] for field_name in self.__data.keys()}
+        self.get = self.__get if not store_data else self.__get_and_store
 
-        # return self.__data.copy()
-        return self.__data
+    def __get(self) -> Tuple[Dict[str, ndarray], Dict[str, ndarray]]:
+        return self.__data, self.__dirty
 
-    def get_data(self, field_name) -> Tuple[Optional[ndarray], Optional[ndarray]]:
-        """
-        Get a specific data field with the associated dirty flag.
+    def __get_and_store(self) -> Tuple[Dict[str, ndarray], Dict[str, ndarray]]:
+        for field_name in self.memory.keys():
+            self.memory[field_name].append(array(self.__data[field_name]))
+        return self.__data, self.__dirty
 
-        :param field_name: Name of the data field.
-        :return: Data field, associated dirty flag
-        """
+    def get_frame(self, idx: int) -> Dict[str, ndarray]:
 
-        return self.__data.get(field_name, None), self.__dirty.get(field_name, None)
+        return {field_name: self.memory[field_name][idx] for field_name in self.memory.keys()}
 
     def close(self) -> None:
         """

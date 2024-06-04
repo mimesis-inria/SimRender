@@ -14,7 +14,7 @@ from SimRender.generic.utils import fix_memory_leak, get_mesh_cells
 
 class Factory:
 
-    def __init__(self, socket_port: int, plotter: Plotter):
+    def __init__(self, socket_port: int, plotter: Plotter, store_data: bool = False):
         """
         This class is used to manage the communication with the simulation process.
         It loads the visualization data from shared arrays.
@@ -56,10 +56,10 @@ class Factory:
                                                             byteorder='big')).decode(encoding='utf-8')
 
             # Receive data shared arrays in memory
-            memory = Memory(remote=self.__socket)
+            memory = Memory(remote=self.__socket, store_data=store_data)
 
             # Create the visual object
-            self.__objects.append(Object(object_type=object_type, memory=memory))
+            self.__objects.append(Object(object_type=object_type, memory=memory, plotter=plotter))
 
         # Plotter instance
         self.plt = plotter
@@ -114,11 +114,16 @@ class Factory:
 
         # Update each visual object
         for o in self.__objects:
-            o.update(plt=self.plt)
+            o.update()
 
         # Notify the simulation process if the do_synchronize flag is turned on
         if self.__sync_arr[1] == 1:
             self.__socket.send(b'done')
+
+    def set_frame(self, idx: int) -> None:
+
+        for o in self.__objects:
+            o.set_frame(idx=idx)
 
     def close(self):
         """
@@ -142,7 +147,7 @@ class Factory:
 
 class Object:
 
-    def __init__(self, object_type: str, memory: Memory):
+    def __init__(self, object_type: str, memory: Memory, plotter: Plotter):
         """
         This class gathers the methods to create and update visual object instances.
 
@@ -155,10 +160,12 @@ class Object:
 
         # Create the visual object instance
         self.object: Optional[Points] = None
+        self.plt = plotter
         self.__getattribute__(f'_create_{object_type}')()
 
         # Define the update method depending on the visual object type
         self.update = self.__getattribute__(f'_update_{object_type}')
+        self.set_frame = self.__getattribute__(f'_set_frame_{object_type}')
 
     def _create_mesh(self) -> None:
         """
@@ -166,7 +173,7 @@ class Object:
         """
 
         # Access data fields
-        data = self.__memory.data
+        data, _ = self.__memory.get()
         cells = data['cells'] if len(data['cells'].shape) > 1 else get_mesh_cells(flat_cells=data['cells'])
 
         # Create instance
@@ -186,43 +193,64 @@ class Object:
         elif not isnan(data['texture_coords']).any() and data['texture_name'].item() != '':
             self.object.texture(tname=data['texture_name'].item(), tcoords=data['texture_coords'])
 
-    def _update_mesh(self, plt: Plotter) -> None:
+    def _update_mesh(self) -> None:
         """
         Update a mesh instance.
         """
 
         self.object: Mesh
+        data, dirty = self.__memory.get()
 
         # Update positions
-        positions, dirty = self.__memory.get_data(field_name='positions')
-        if dirty:
-            self.object.vertices = positions
+        if dirty['positions']:
+            self.object.vertices = data['positions']
 
         # Update color
-        color, dirty = self.__memory.get_data(field_name='color')
-        color = color.item() if len(color.shape) == 0 else color
-        if dirty:
-            self.object.color(color)
-        alpha, dirty = self.__memory.get_data(field_name='alpha')
-        if dirty:
-            self.object.alpha(alpha.item())
-        colormap_field, dirty = self.__memory.get_data(field_name='colormap_field')
-        if dirty:
-            colormap, _ = self.__memory.get_data(field_name='colormap')
-            colormap_range, _ = self.__memory.get_data(field_name='colormap_range')
-            if not isnan(colormap_range).any():
-                self.object.cmap(input_cmap=colormap.item(), input_array=colormap_field,
-                                 vmin=colormap_range[0], vmax=colormap_range[1])
+        if dirty['color']:
+            self.object.color(data['color'].item() if len(data['color'].shape) == 0 else data['color'])
+        if dirty['alpha']:
+            self.object.alpha(data['alpha'].item())
+        if dirty['colormap_field']:
+            if not isnan(data['colormap_range']).any():
+                self.object.cmap(input_cmap=data['colormap'].item(),
+                                 input_array=data['colormap_field'],
+                                 vmin=data['colormap_range'][0], vmax=data['colormap_range'][1])
             else:
-                self.object.cmap(input_cmap=colormap.item(), input_array=colormap_field)
+                self.object.cmap(input_cmap=data['colormap'].item(),
+                                 input_array=data['colormap_field'])
 
         # Update rendering style
-        wireframe, dirty = self.__memory.get_data(field_name='wireframe')
-        if dirty:
-            self.object.wireframe(wireframe.item())
-        line_width, dirty = self.__memory.get_data(field_name='line_width')
-        if dirty:
-            self.object.lw(linewidth=line_width.item())
+        if dirty['wireframe']:
+            self.object.wireframe(data['wireframe'].item())
+        if dirty['line_width']:
+            self.object.linewidth(data['line_width'].item())
+
+    def _set_frame_mesh(self, idx: int) -> None:
+        """
+        Update a mesh instance.
+        """
+
+        self.object: Mesh
+        data = self.__memory.get_frame(idx=idx)
+
+        # Update positions
+        self.object.vertices = data['positions']
+
+        # Update color
+        self.object.color(data['color'].item() if len(data['color'].shape) == 0 else data['color'])
+        self.object.alpha(data['alpha'].item())
+        if not isnan(data['colormap_field']).any():
+            if not isnan(data['colormap_range']).any():
+                self.object.cmap(input_cmap=data['colormap'].item(),
+                                 input_array=data['colormap_field'],
+                                 vmin=data['colormap_range'][0], vmax=data['colormap_range'][1])
+            else:
+                self.object.cmap(input_cmap=data['colormap'].item(),
+                                 input_array=data['colormap_field'])
+
+        # Update rendering style
+        self.object.wireframe(data['wireframe'].item())
+        self.object.linewidth(data['line_width'].item())
 
     def _create_points(self) -> None:
         """
@@ -230,7 +258,7 @@ class Object:
         """
 
         # Access data fields
-        data = self.__memory.data
+        data, _ = self.__memory.get()
 
         # Create instance
         color = data['color'].item() if len(data['color'].shape) == 0 else data['color']
@@ -245,40 +273,59 @@ class Object:
             else:
                 self.object.cmap(input_cmap=data['colormap'].item(), input_array=data['colormap_field'])
 
-    def _update_points(self, plt: Plotter):
+    def _update_points(self):
         """
         Update a point cloud instance.
         """
 
         self.object: Points
+        data, dirty = self.__memory.get()
 
         # Update positions
-        positions, dirty = self.__memory.get_data(field_name='positions')
-        if dirty:
-            self.object.vertices = positions
+        if dirty['positions']:
+            self.object.vertices = data['positions']
 
         # Update color
-        color, dirty = self.__memory.get_data(field_name='color')
-        color = color.item() if len(color.shape) == 0 else color
-        if dirty:
-            self.object.color(color)
-        alpha, dirty = self.__memory.get_data(field_name='alpha')
-        if dirty:
-            self.object.alpha(alpha.item())
-        colormap_field, dirty = self.__memory.get_data(field_name='colormap_field')
-        if dirty:
-            colormap, _ = self.__memory.get_data(field_name='colormap')
-            colormap_range, _ = self.__memory.get_data(field_name='colormap_range')
-            if not isnan(colormap_range).any():
-                self.object.cmap(input_cmap=colormap.item(), input_array=colormap_field,
-                                 vmin=colormap_range[0], vmax=colormap_range[1])
+        if dirty['color']:
+            self.object.color(data['color'].item() if len(data['color'].shape) == 0 else data['color'])
+        if dirty['alpha']:
+            self.object.alpha(data['alpha'].item())
+        if dirty['colormap_field']:
+            if not isnan(data['colormap_range']).any():
+                self.object.cmap(input_cmap=data['colormap'].item(),
+                                 input_array=data['colormap_field'],
+                                 vmin=data['colormap_range'][0], vmax=data['colormap_range'][1])
             else:
-                self.object.cmap(input_cmap=colormap.item(), input_array=colormap_field)
+                self.object.cmap(input_cmap=data['colormap'].item(), input_array=data['colormap_field'])
 
         # Update rendering style
-        point_size, dirty = self.__memory.get_data(field_name='point_size')
-        if dirty:
-            self.object.point_size(point_size.item())
+        if dirty['point_size']:
+            self.object.point_size(data['point_size'].item())
+
+    def _set_frame_points(self, idx: int):
+        """
+        Update a point cloud instance.
+        """
+
+        self.object: Points
+        data = self.__memory.get_frame(idx=idx)
+
+        # Update positions
+        self.object.vertices = data['positions']
+
+        # Update color
+        self.object.color(data['color'].item() if len(data['color'].shape) == 0 else data['color'])
+        self.object.alpha(data['alpha'].item())
+        if not isnan(data['colormap_field']).any():
+            if not isnan(data['colormap_range']).any():
+                self.object.cmap(input_cmap=data['colormap'].item(),
+                                 input_array=data['colormap_field'],
+                                 vmin=data['colormap_range'][0], vmax=data['colormap_range'][1])
+            else:
+                self.object.cmap(input_cmap=data['colormap'].item(), input_array=data['colormap_field'])
+
+        # Update rendering style
+        self.object.point_size(data['point_size'].item())
 
     def _create_arrows(self) -> None:
         """
@@ -286,7 +333,7 @@ class Object:
         """
 
         # Access data fields
-        data = self.__memory.data
+        data, _ = self.__memory.get()
 
         # Create instance
         color = data['color'].item() if len(data['color'].shape) == 0 else data['color']
@@ -302,36 +349,56 @@ class Object:
             cmap = get_cmap(data['colormap'].item())
             self.object.color(c=cmap(cmap_norm(data['colormap_field']))[:, :3])
 
-    def _update_arrows(self, plt: Plotter):
+    def _update_arrows(self):
         """
         Update an arrows instance.
         """
 
         self.object: Arrows
+        data, dirty = self.__memory.get()
 
         # Update positions & vectors
-        positions, dirty_p = self.__memory.get_data(field_name='positions')
-        vectors, dirty_v = self.__memory.get_data(field_name='vectors')
-        if dirty_p or dirty_v:
-            plt.remove(self.object)
+        if dirty['positions'] or dirty['vectors']:
+            self.plt.remove(self.object)
             self._create_arrows()
-            plt.add(self.object)
+            self.plt.add(self.object)
 
         # Update color
-        color, dirty = self.__memory.get_data(field_name='color')
-        color = color.item() if len(color.shape) == 0 else color
-        if dirty:
-            self.object.color(color)
-        alpha, dirty = self.__memory.get_data(field_name='alpha')
-        if dirty:
-            self.object.alpha(alpha.item())
-        colormap_field, dirty = self.__memory.get_data(field_name='colormap_field')
-        if dirty:
-
-            if not isnan(self.__memory.data['colormap_range']).any():
-                cmap_norm = Normalize(vmin=float(self.__memory.data['colormap_range'][0]),
-                                      vmax=float(self.__memory.data['colormap_range'][1]))
+        if dirty['color']:
+            self.object.color(data['color'].item() if len(data['color'].shape) == 0 else data['color'])
+        if dirty['alpha']:
+            self.object.alpha(data['alpha'].item())
+        if dirty['colormap_field']:
+            if not isnan(data['colormap_range']).any():
+                cmap_norm = Normalize(vmin=float(data['colormap_range'][0]),
+                                      vmax=float(data['colormap_range'][1]))
             else:
-                cmap_norm = Normalize(vmin=min(colormap_field), vmax=max(colormap_field))
-            cmap = get_cmap(self.__memory.data['colormap'].item())
-            self.object.color(c=cmap(cmap_norm(colormap_field))[:, :3])
+                cmap_norm = Normalize(vmin=min(data['colormap_field']), vmax=max(data['colormap_field']))
+            cmap = get_cmap(data['colormap'].item())
+            self.object.color(c=cmap(cmap_norm(data['colormap_field']))[:, :3])
+
+    def _set_frame_arrows(self, idx: int):
+        """
+        Update an arrows instance.
+        """
+
+        self.object: Arrows
+        data = self.__memory.get_frame(idx=idx)
+
+        self.plt.remove(self.object)
+
+        # Create instance
+        color = data['color'].item() if len(data['color'].shape) == 0 else data['color']
+        self.object = Arrows(start_pts=data['positions'], end_pts=data['positions'] + data['vectors'],
+                             c=color, alpha=data['alpha'].item())
+
+        # Apply cmap
+        if not isnan(data['colormap_field']).any():
+            if not isnan(data['colormap_range']).any():
+                cmap_norm = Normalize(vmin=float(data['colormap_range'][0]), vmax=float(data['colormap_range'][1]))
+            else:
+                cmap_norm = Normalize(vmin=min(data['colormap_field']), vmax=max(data['colormap_field']))
+            cmap = get_cmap(data['colormap'].item())
+            self.object.color(c=cmap(cmap_norm(data['colormap_field']))[:, :3])
+
+        self.plt.add(self.object)
