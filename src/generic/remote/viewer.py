@@ -5,7 +5,7 @@ from SimRender.generic.remote.factory import Factory
 
 class Viewer(Plotter):
 
-    def __init__(self, socket_port: int, *args, **kwargs):
+    def __init__(self, socket_port: int, store_data: bool = False, *args, **kwargs):
         """
         Viewer to render visual objects.
 
@@ -16,7 +16,7 @@ class Viewer(Plotter):
         super().__init__(interactive=True, *args, **kwargs)
 
         # Create a Factory to recover the visual objects from the simulation process
-        self.factory = Factory(socket_port=socket_port, plotter=self)
+        self.factory = Factory(socket_port=socket_port, plotter=self, store_data=store_data)
 
         # Add visual objects from the factory
         self.add(self.factory.vedo_objects)
@@ -27,7 +27,7 @@ class Viewer(Plotter):
         self.bg_id = 0
 
         # Timer callback
-        self.add_callback(event_name='timer', func=self.time_step, enable_picking=True)
+        self.cid = self.add_callback(event_name='timer', func=self.time_step, enable_picking=True)
         self.timer_id = self.timer_callback(action='create', dt=1)
         self.count = 0
 

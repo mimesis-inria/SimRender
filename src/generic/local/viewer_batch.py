@@ -15,7 +15,6 @@ class ViewerBatch:
         """
 
         self.__subprocess: Optional[Thread] = None
-        self.__remote_viewer = viewer_batch.__file__
 
     def start(self, nb_view: int) -> List[int]:
         """
@@ -25,7 +24,7 @@ class ViewerBatch:
         """
 
         def __launch(ports: List[int]):
-            run([executable, self.__remote_viewer, ' '.join([str(port) for port in ports])])
+            run([executable, viewer_batch.__file__, ' '.join([str(port) for port in ports])])
 
         available_socket_ports = []
         for _ in range(nb_view):

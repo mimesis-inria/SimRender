@@ -22,7 +22,7 @@ class Viewer(_Viewer):
         # Create a Factory to manage visual objects and remote communication
         self.__factory = Factory(root_node=root_node, sync=sync)
         self.__subprocess: Optional[Thread] = None
-        self.__remote_viewer = viewer.__file__
+        self._remote_script = viewer.__file__
 
     @property
     def objects(self) -> Objects:
