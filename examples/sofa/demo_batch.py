@@ -1,6 +1,6 @@
 import Sofa
 
-from SimRender.generic import ViewerBatch
+from SimRender.core import ViewerBatch
 from SimRender.sofa import Viewer
 
 from simulation_logo import Simulation

@@ -4,7 +4,7 @@ from threading import Thread
 from subprocess import run
 from sys import executable
 
-from SimRender.generic.remote import viewer_batch
+from SimRender.core.remote import viewer_batch
 
 
 class ViewerBatch:

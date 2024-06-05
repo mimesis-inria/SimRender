@@ -2,7 +2,7 @@ from os.path import dirname, join
 from numpy import ones, zeros
 from vedo import Image
 
-from SimRender.generic.remote.viewer import Viewer as _Viewer
+from SimRender.core.remote.viewer import Viewer as _Viewer
 
 
 class Viewer(_Viewer):

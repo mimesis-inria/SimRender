@@ -1,6 +1,6 @@
 from vedo import Plotter, get_color
 
-from SimRender.generic.remote.factory import Factory
+from SimRender.core.remote.factory import Factory
 
 
 class Viewer(Plotter):

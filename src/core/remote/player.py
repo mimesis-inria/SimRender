@@ -1,4 +1,4 @@
-from SimRender.generic.remote.viewer import Viewer
+from SimRender.core.remote.viewer import Viewer
 
 
 PLAY_SYMBOL = "  \u23F5  "

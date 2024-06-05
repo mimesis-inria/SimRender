@@ -5,7 +5,7 @@ from PySide6.QtGui import QAction
 from vtkmodules.qt.QVTKRenderWindowInteractor import QVTKRenderWindowInteractor
 from vedo import Plotter
 
-from SimRender.generic.remote.factory import Factory
+from SimRender.core.remote.factory import Factory
 
 
 class ViewerBatch(QMainWindow):

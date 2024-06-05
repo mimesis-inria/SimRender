@@ -1,7 +1,7 @@
 from typing import List, Union, Dict
 import Sofa
 
-from SimRender.generic.local.factory import Factory as _Factory, Objects as _Objects
+from SimRender.core.local.factory import Factory as _Factory, Objects as _Objects
 from SimRender.sofa.local.scene_graph import SceneGraph
 from SimRender.sofa.local.sofa_objects import SOFA_OBJECTS, Base
 

@@ -1,4 +1,4 @@
-from SimRender.generic import Viewer, ViewerBatch
+from SimRender.core import Viewer, ViewerBatch
 from simulation import Simulation
 
 

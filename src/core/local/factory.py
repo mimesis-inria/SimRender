@@ -4,8 +4,8 @@ from multiprocessing.shared_memory import SharedMemory
 from time import sleep
 from numpy import array, ndarray, nan
 
-from SimRender.generic.local.memory import Memory
-from SimRender.generic.utils import flat_mesh_cells
+from SimRender.core.local.memory import Memory
+from SimRender.core.utils import flat_mesh_cells
 
 
 class Factory:

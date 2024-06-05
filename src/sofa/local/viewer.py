@@ -2,7 +2,7 @@ from typing import Optional
 from threading import Thread
 import Sofa
 
-from SimRender.generic.local.viewer import Viewer as _Viewer
+from SimRender.core.local.viewer import Viewer as _Viewer
 from SimRender.sofa.local.factory import Factory, Objects
 from SimRender.sofa.remote import viewer
 

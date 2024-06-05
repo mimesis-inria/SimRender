@@ -1,4 +1,4 @@
-from SimRender.generic.remote.player import Player as _Player
+from SimRender.core.remote.player import Player as _Player
 from SimRender.sofa.remote.viewer import Viewer
 
 

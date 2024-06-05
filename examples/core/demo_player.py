@@ -1,4 +1,4 @@
-from SimRender.generic import Viewer
+from SimRender.core import Player
 from simulation import Simulation
 
 
@@ -6,16 +6,16 @@ if __name__ == '__main__':
 
     # Create the simulation and the viewer
     simu = Simulation()
-    viewer = Viewer(sync=True)
+    player = Player()
 
     # Init the visualization
-    simu.init_viewer(viewer=viewer)
-    viewer.launch()
+    simu.init_viewer(viewer=player)
+    player.launch()
 
     # Run some steps of the simulation
     for _ in range(500):
         simu.step()
-        viewer.render()
+        player.render()
 
     # Close the rendering window
-    viewer.shutdown()
+    player.shutdown()

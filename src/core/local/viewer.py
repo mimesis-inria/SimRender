@@ -3,8 +3,8 @@ from threading import Thread
 from subprocess import run
 from sys import executable
 
-from SimRender.generic.local.factory import Factory, Objects
-from SimRender.generic.remote import viewer
+from SimRender.core.local.factory import Factory, Objects
+from SimRender.core.remote import viewer
 
 
 class Viewer:

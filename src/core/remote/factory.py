@@ -8,8 +8,8 @@ from vedo import Plotter, Mesh, Points, Arrows
 from matplotlib.colors import Normalize
 from matplotlib.pyplot import get_cmap
 
-from SimRender.generic.remote.memory import Memory
-from SimRender.generic.utils import fix_memory_leak, get_mesh_cells
+from SimRender.core.remote.memory import Memory
+from SimRender.core.utils import fix_memory_leak, get_mesh_cells
 
 
 class Factory:

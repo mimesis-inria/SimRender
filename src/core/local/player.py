@@ -1,5 +1,5 @@
-from SimRender.generic.local.viewer import Viewer
-from SimRender.generic.remote import player
+from SimRender.core.local.viewer import Viewer
+from SimRender.core.remote import player
 
 
 class Player(Viewer):

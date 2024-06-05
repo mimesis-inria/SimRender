@@ -3,7 +3,7 @@ from os.path import join, dirname
 import numpy as np
 from vedo import Mesh
 
-from SimRender.generic import Viewer
+from SimRender.core import Viewer
 
 
 file = lambda f: join(dirname(__file__), 'data', f)
