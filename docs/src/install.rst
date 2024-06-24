@@ -53,7 +53,7 @@ Install from sources
 
 .. code-block:: bash
 
-    git clone git+https://github.com/RobinEnjalbert/SimRender.git
+    git clone https://github.com/RobinEnjalbert/SimRender.git
     cd SimRender
     pip install -e .
 
