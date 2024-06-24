@@ -37,7 +37,10 @@ Additional SOFA features
 Gallery
 -------
 
-.. image:: _static/img/gallery.png
+.. image:: _static/img/heart.gif
+
+.. image:: _static/img/logo.gif
+
 
 
 .. toctree::
