@@ -32,7 +32,6 @@ extensions = ['sphinx.ext.duration',
               'sphinx.ext.autosummary',
               'sphinx.ext.viewcode',
               'sphinx.ext.extlinks',
-              'sphinx_tabs.tabs'
               ]
 
 intersphinx_mapping = {'python': ('https://docs.python.org/3/', None),
