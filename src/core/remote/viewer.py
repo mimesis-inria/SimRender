@@ -27,6 +27,7 @@ class Viewer(Plotter):
         self.bg_id = 0
 
         # Timer callback
+        self.initialize_interactor()  # needed for windows
         self.cid = self.add_callback(event_name='timer', func=self.time_step, enable_picking=True)
         self.timer_id = self.timer_callback(action='create', dt=1)
         self.count = 0
