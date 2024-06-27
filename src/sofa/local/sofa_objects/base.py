@@ -9,6 +9,7 @@ class Base:
         self.sofa_object = sofa_object
         self.sofa_node: Sofa.Core.Node = sofa_object.getLinks()[0].getLinkedBase()
         self.object_type = ''
+        self.display_model = ''
 
     def create(self) -> Dict[str, Any]:
         raise NotImplementedError

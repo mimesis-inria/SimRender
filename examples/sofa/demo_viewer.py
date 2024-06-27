@@ -1,8 +1,8 @@
 import Sofa
 
 from SimRender.sofa import Viewer
-from simulation_logo import Simulation
-# from simulation_caduceus import Simulation
+# from simulation_logo import Simulation
+from simulation_caduceus import Simulation
 
 
 if __name__ == '__main__':
@@ -14,7 +14,10 @@ if __name__ == '__main__':
 
     # VIEWER: create the viewer, create objects and start the rendering
     viewer = Viewer(root_node=root, sync=False)
-    viewer.objects.add_scene_graph()
+    viewer.objects.add_scene_graph(visual_models=True,
+                                   behavior_models=True,
+                                   force_fields=True,
+                                   collision_models=False)
     viewer.launch()
 
     # SOFA: run a few time steps

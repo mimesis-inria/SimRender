@@ -9,6 +9,7 @@ class OglModel(Mesh):
     def __init__(self, sofa_object: Sofa.Core.Object):
 
         super().__init__(sofa_object=sofa_object)
+        self.display_model = 'visual'
 
     def create(self) -> Dict[str, Any]:
 
@@ -50,6 +51,7 @@ class TriangleCollisionModel(Mesh):
     def __init__(self, sofa_object: Sofa.Core.Object):
 
         super().__init__(sofa_object=sofa_object)
+        self.display_model = 'collision'
 
     def create(self) -> Dict[str, Any]:
 
@@ -77,6 +79,7 @@ class LineCollisionModel(Mesh):
     def __init__(self, sofa_object: Sofa.Core.Object):
 
         super().__init__(sofa_object=sofa_object)
+        self.display_model = 'collision'
 
     def create(self) -> Dict[str, Any]:
 

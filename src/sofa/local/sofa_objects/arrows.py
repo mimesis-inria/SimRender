@@ -10,6 +10,7 @@ class ConstantForceField(Arrows):
     def __init__(self, sofa_object: Sofa.Core.Object):
 
         super().__init__(sofa_object=sofa_object)
+        self.display_model = 'force'
 
     def create(self) -> Dict[str, Any]:
 

@@ -86,7 +86,15 @@ class Objects(_Objects):
     def add_scene_graph(self) -> None:
         """
         The whole SOFA scene graph is explored to create visual objects automatically.
+
+        :param visual_models: If True, display each detected visual model in the scene graph.
+        :param behavior_models: If True, display each detected behavior model in the scene graph.
+        :param force_fields: If True, display each detected force field in the scene graph.
+        :param collision_models: If True, display each detected collision model in the scene graph.
         """
+
+        display_models = {'visual': visual_models, 'behavior': behavior_models,
+                          'force': force_fields, 'collision': collision_models}
 
         # Process each sofa object in the scene graph
         for key, sofa_object in self.__scene_graph.graph.items():
@@ -102,6 +110,7 @@ class Objects(_Objects):
             # Check if a configuration exists for the object
             elif object_class in SOFA_OBJECTS:
                 data_wrapper = SOFA_OBJECTS[object_class](sofa_object=sofa_object)
-                func = self.__getattribute__(f'add_{data_wrapper.object_type}')
-                idx = func(**data_wrapper.create())
-                self.__factory.callbacks[idx] = data_wrapper
+                if display_models[data_wrapper.display_model]:
+                    func = self.__getattribute__(f'add_{data_wrapper.object_type}')
+                    idx = func(**data_wrapper.create())
+                    self.__factory.callbacks[idx] = data_wrapper
