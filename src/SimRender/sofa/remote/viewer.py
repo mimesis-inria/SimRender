@@ -7,14 +7,14 @@ from SimRender.core.remote.viewer import Viewer as _Viewer
 
 class Viewer(_Viewer):
 
-    def __init__(self, socket_port: int):
+    def __init__(self, socket_port: int, *args, **kwargs):
         """
         Viewer to render visual objects.
 
         :param socket_port: Port number of the simulation socket.
         """
 
-        super().__init__(socket_port=socket_port, bg=join(dirname(__file__), 'back_white.png'))
+        super().__init__(socket_port=socket_port, bg=join(dirname(__file__), 'back_white.png'), *args, **kwargs)
 
         # Get the automatically created background renderer and remove image actor
         acs = self.background_renderer.GetViewProps()
