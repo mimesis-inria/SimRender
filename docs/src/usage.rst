@@ -128,8 +128,8 @@ A tab menu is created to easily switch between the simulation renderings.
     batch.stop()
 
 
-Factory
--------
+Step 2: Create / Update objects
+-------------------------------
 
 The API to create and update 3D objects is exposed in the :py:class:`Viewer.objects<SimRender.core.local.factory.Objects>`
 variable.
