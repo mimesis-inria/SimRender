@@ -140,8 +140,9 @@ Create objects
 """"""""""""""
 
 Several object types can be created using :py:meth:`add_mesh<SimRender.core.local.factory.Objects.add_mesh>`,
-:py:meth:`add_points<SimRender.core.local.factory.Objects.add_points>` or
-:py:meth:`add_arrows<SimRender.core.local.factory.Objects.add_arrows>`.
+:py:meth:`add_points<SimRender.core.local.factory.Objects.add_points>`,
+:py:meth:`add_arrows<SimRender.core.local.factory.Objects.add_arrows>` or
+:py:meth:`add_text<SimRender.core.local.factory.Objects.add_text>`.
 Bellow are only the required variables, click on the respective button to get the detailed list of available options
 for an object.
 
@@ -167,14 +168,45 @@ for an object.
                                           vectors=...,
                                           **kwargs)
 
+    # Add a text to the viewer
+    idx_text = viewer.objects.add_text(content=...)
+
 
 Update objects
 """"""""""""""
 
 To update the created objects, the respective methods
 (:py:meth:`update_mesh<SimRender.core.local.factory.Objects.update_mesh>`,
-:py:meth:`update_points<SimRender.core.local.factory.Objects.update_points>` or
-:py:meth:`update_arrows<SimRender.core.local.factory.Objects.update_arrows>`) require the object index that was given
+:py:meth:`update_points<SimRender.core.local.factory.Objects.update_points>`,
+:py:meth:`update_arrows<SimRender.core.local.factory.Objects.update_arrows>` or
+:py:meth:`update_text<SimRender.core.local.factory.Objects.update_text>`) require the object index that was given
 following the creation order.
 Bellow are only the required variables, click on the respective button to get the detailed list of available options
 for an object.
+
+.. code-block:: python
+
+    from SimRender.core import Viewer
+
+    # Create the viewer
+    viewer = Viewer()
+
+    # Add a mesh to the viewer
+    viewer.objects.update_mesh(object_id=idx_mesh,
+                               positions=...,
+                               **kwargs)
+
+    # Add a point cloud to the viewer
+    viewer.objects.update_points(object_id=idx_points,
+                                 positions=...,
+                                 **kwargs)
+
+    # Add a vector field to the viewer
+    viewer.object.add_arrows(object_id=idx_arrows,
+                             positions=...,
+                             vectors=...,
+                             **kwargs)
+
+    # Add a text to the viewer
+    viewer.objects.add_text(object_id=idx_text,
+                            content=...)

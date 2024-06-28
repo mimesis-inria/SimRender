@@ -62,6 +62,9 @@ class Simulation:
                                        alpha=1,
                                        point_size=10)
 
+        # Add text for the number of step
+        self.viewer.objects.add_text(content='Step: 0')
+
     def step(self) -> None:
         """
         Load the next state of the simulation and update the viewer.
@@ -80,3 +83,5 @@ class Simulation:
                                         positions=self.vessel_pos[self.step_id])
         self.viewer.objects.update_points(object_id=2,
                                           positions=self.heart_pos[self.step_id][self.track])
+        self.viewer.objects.update_text(object_id=3,
+                                        content=f'Step: {self.step_id}')

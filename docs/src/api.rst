@@ -15,4 +15,4 @@ API - Generic
     :members: start, stop
 
 .. autoclass:: SimRender.core.local.factory.Objects
-    :members: add_mesh, update_mesh, add_points, update_points, add_arrows, update_arrows
+    :members: add_mesh, update_mesh, add_points, update_points, add_arrows, update_arrows, add_text, update_text

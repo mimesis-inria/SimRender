@@ -334,3 +334,47 @@ class Objects:
         """
 
         self.__update_object(object_type='arrows', data=locals())
+
+    def add_text(self,
+                 content: str,
+                 corner: str = 'BR',
+                 color: str = 'black',
+                 font: str = '',
+                 size: int = 1,
+                 bold: bool = False,
+                 italic: bool = False) -> int:
+        """
+        Add 2D text in the viewer.
+
+        :param content: Text content (max 100 car.).
+        :param corner: Vertical (Top, Middle, Bottom) and horizontal (Left, Middle, Right) positions of the Text - for
+                       instance, 'BR' stands for 'bottom-right'.
+        :param color: Text color.
+        :param font: Text font name.
+        :param size: Text size.
+        :param bold: If True, apply bold style to the text.
+        :param italic: If True, apply italic style to the text.
+        :return: ID of the object in the viewer.
+        """
+
+        content = array(content, dtype='<U100')
+        return self.__add_object(object_type='text', data=locals())
+
+    def update_text(self,
+                    object_id: int,
+                    content: str,
+                    color: str = 'black',
+                    bold: bool = False,
+                    italic: bool = False) -> None:
+        """
+        Update an existing text in the viewer.
+
+        :param object_id: ID of the object as returned when created.
+        :param content: Text content (max 100 car.).
+        :param color: Text color.
+        :param bold: If True, apply bold style to the text.
+        :param italic: If True, apply italic style to the text.
+        """
+
+        content = array(content, dtype='<U100')
+        self.__update_object(object_type='text', data=locals())

@@ -4,7 +4,7 @@ from threading import Thread
 from multiprocessing.shared_memory import SharedMemory
 from time import sleep
 from numpy import array, ndarray, isnan
-from vedo import Plotter, Mesh, Points, Arrows
+from vedo import Plotter, Mesh, Points, Arrows, Text2D
 from matplotlib.colors import Normalize
 from matplotlib.pyplot import get_cmap
 
@@ -402,3 +402,72 @@ class Object:
             self.object.color(c=cmap(cmap_norm(data['colormap_field']))[:, :3])
 
         self.plt.add(self.object)
+
+    def _create_text(self):
+        """
+        Create a text instance.
+        """
+
+        # Access data fields
+        data, _ = self.__memory.get()
+
+        # Create instance
+        # content = data['content'].item().to_bytes((data['content'].item().bit_length() + 7) // 8, 'little')
+        # content = content.decode('utf-8')
+        content = data['content'].item()
+        coord = {'R': 'right', 'L': 'left', 'T': 'top', 'M': 'middle', 'B': 'bottom'}
+        corner = data['corner'].item()
+        pos = f'{coord[corner[0].upper()]}-{coord[corner[1].upper()]}'
+        color = data['color'].item() if len(data['color'].shape) == 0 else data['color']
+        self.object = Text2D(txt=content,
+                             pos=pos,
+                             s=data['size'].item(),
+                             font=data['font'].item(),
+                             bold=data['bold'].item(),
+                             italic=data['italic'].item(),
+                             c=color)
+
+    def _update_text(self):
+        """
+        Update a text instance.
+        """
+
+        self.object: Text2D
+        data, dirty = self.__memory.get()
+
+        # Update content
+        if dirty['content']:
+            # content = data['content'].item().to_bytes((data['content'].item().bit_length() + 7) // 8, 'little')
+            # content = content.decode('utf-8')
+            content = data['content'].item()
+            self.object.text(txt=content)
+
+        # Update color
+        if dirty['color']:
+            self.object.color(data['color'].item() if len(data['color'].shape) == 0 else data['color'])
+
+        # Update rendering style
+        if dirty['bold']:
+            self.object.bold(data['bold'].item())
+        if dirty['italic']:
+            self.object.italic(data['italic'].item())
+
+    def _set_frame_text(self, idx: int):
+        """
+        Create a text instance.
+        """
+
+        self.object: Text2D
+        data = self.__memory.get_frame(idx=idx)
+
+        # Update content
+        # content = data['content'].item().to_bytes((data['content'].item().bit_length() + 7) // 8, 'little')
+        # content = content.decode('utf-8')
+        content = data['content'].item()
+        self.object.text(txt=content)
+
+        # Update color
+        self.object.color(data['color'].item() if len(data['color'].shape) == 0 else data['color'])
+
+        # Update rendering style
+        self.object.bold(data['bold'].item()).italic(data['italic'].item())
