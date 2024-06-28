@@ -38,7 +38,7 @@ Install with *pip*
 
 .. code-block:: bash
 
-    $ pip3 install git+https://github.com/RobinEnjalbert/SimRender.git
+    $ pip install git+https://github.com/RobinEnjalbert/SimRender.git
 
 Then, you should be able to run:
 

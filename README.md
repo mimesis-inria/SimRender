@@ -43,27 +43,14 @@ See more on the project [**documentation**]().
 
 ## Install
 
-### Install with pip
-
-**SimRender** is registered on [PyPi](), thus it can be installed easily using `pip`:
-
 ``` bash
-$ pip3 install SimRender
-```
+# Option 1 (USERS): install with pip
+$ pip install git+https://github.com/RobinEnjalbert/SimRender.git
 
-### Install from sources
-
-**SimRender** is easily installable from source as well using the following commands:
-
-``` bash
+# Option 2 (DEVS): install as editable
 $ git clone https://github.com/RobinEnjalbert/SimRender.git
 $ cd SimRender
-
-# Option 1: Install as non-editable (recommended for users)
-$ pip3 install .
-
-# Option 2: Install as editable (recommended for developers)
-$ python3 setup_dev.py
+$ pip install -e .
 ```
 
 See more on the project [**documentation**]().
