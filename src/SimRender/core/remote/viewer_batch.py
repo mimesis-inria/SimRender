@@ -1,7 +1,6 @@
 from typing import List, Optional
 import sys
-from PySide6.QtWidgets import QWidget, QApplication, QMainWindow, QFrame, QVBoxLayout
-from PySide6.QtGui import QAction
+from PySide6.QtWidgets import QWidget, QApplication, QMainWindow, QFrame, QVBoxLayout, QComboBox
 from vtkmodules.qt.QVTKRenderWindowInteractor import QVTKRenderWindowInteractor
 from vedo import Plotter
 
@@ -31,12 +30,10 @@ class ViewerBatch(QMainWindow):
             for factory in self.factories[1:]:
                 factory.active = False
 
-        # Create menu
-        source_menu = self.menuBar().addMenu('Simulation')
-        for i in range(len(self.factories)):
-            action = QAction(f'source {i + 1}', self)
-            action.triggered.connect(self.select_source(i))
-            source_menu.addAction(action)
+        # Create source selection combobox
+        source_cbox = QComboBox(parent=self.frame)
+        source_cbox.addItems([f'Simulation n°{i + 1}' for i in range(len(self.factories))])
+        source_cbox.currentIndexChanged.connect(self.select_cbox_source)
 
         # Add visual objects from the factory
         self.plt.add(self.active_factory.vedo_objects)
@@ -48,20 +45,22 @@ class ViewerBatch(QMainWindow):
 
         self.plt.show(axes=4)
         self.layout.addWidget(self.vtk_widget)
+        self.layout.addWidget(source_cbox)
         self.frame.setLayout(self.layout)
         self.setCentralWidget(self.frame)
         self.show()
 
-    def select_source(self, source):
+    def select_cbox_source(self, idx: int) -> None:
+        """
+        Signal connected to the QCombobox to change the simulation source.
 
-        def __select_source():
+        :param idx: Index of the item selected in the QCombobox.
+        """
 
-            if self.factories[source] != self.active_factory:
-                self.plt.remove(self.active_factory.vedo_objects)
-                self.active_factory = self.factories[source]
-                self.plt.add(self.active_factory.vedo_objects)
-
-        return __select_source
+        if self.factories[idx] != self.active_factory:
+            self.plt.remove(self.active_factory.vedo_objects)
+            self.active_factory = self.factories[idx]
+            self.plt.add(self.active_factory.vedo_objects)
 
     def time_step(self, _) -> None:
         """
