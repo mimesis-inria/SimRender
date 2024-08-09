@@ -4,7 +4,7 @@ from threading import Thread
 from multiprocessing.shared_memory import SharedMemory
 from time import sleep
 from numpy import array, ndarray, isnan
-from vedo import Plotter, Mesh, Points, Arrows, Text2D
+from vedo import Plotter, Mesh, Points, Arrows, Lines, Text2D
 from matplotlib.colors import Normalize
 from matplotlib.pyplot import get_cmap
 
@@ -402,6 +402,49 @@ class Object:
             self.object.color(c=cmap(cmap_norm(data['colormap_field']))[:, :3])
 
         self.plt.add(self.object)
+
+    def _create_lines(self):
+        """
+        Create a lines instance.
+        """
+
+        # Access data fields
+        data, _ = self.__memory.get()
+
+        # Create instance
+        color = data['color'].item() if len(data['color'].shape) == 0 else data['color']
+        self.object = Lines(start_pts=data['start_positions'], end_pts=data['end_positions'],
+                            c=color, alpha=data['alpha'].item())
+        self.object.lw(linewidth=data['line_width'].item())
+
+    def _update_lines(self):
+        """
+        Update a lines instance.
+        """
+
+        self.object: Lines
+        data, dirty = self.__memory.get()
+
+        # Update positions
+        if dirty['start_positions'] or dirty['end_positions']:
+            self.object.vertices = array([data['start_positions'], data['end_positions']]).T.reshape((3, -1)).T
+
+        # Update color
+        if dirty['color']:
+            self.object.color(data['color'].item() if len(data['color'].shape) == 0 else data['color'])
+        if dirty['alpha']:
+            self.object.alpha(data['alpha'].item())
+
+        # Update rendering style
+        if dirty['line_width']:
+            self.object.linewidth(data['line_width'].item())
+
+    def _set_frame_lines(self, idx: int):
+        """
+        Update a lines instance.
+        """
+
+        self.object: Lines
 
     def _create_text(self):
         """

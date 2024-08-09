@@ -335,6 +335,45 @@ class Objects:
 
         self.__update_object(object_type='arrows', data=locals())
 
+    def add_lines(self,
+                  start_positions: ndarray,
+                  end_positions: ndarray,
+                  color: str = 'green',
+                  alpha: float = 1.,
+                  line_width: float = 1.) -> int:
+        """
+        Add line segments to the viewer.
+
+        :param start_positions: Start position of each line segment.
+        :param end_positions: End position of each line segment.
+        :param color: Color of the lines.
+        :param alpha: Opacity of the lines.
+        :param line_width: Width of the lines.
+        :return: ID of the object in the viewer.
+        """
+
+        return self.__add_object(object_type='lines', data=locals())
+
+    def update_lines(self,
+                     object_id: int,
+                     start_positions: Optional[ndarray] = None,
+                     end_positions: Optional[ndarray] = None,
+                     color: Optional[str] = None,
+                     alpha: Optional[float] = None,
+                     line_width: Optional[float] = None) -> None:
+        """
+        Update existing line segments in the viewer.
+
+        :param object_id: ID of the object as returned when created.
+        :param start_positions: Start position of each line segment.
+        :param end_positions: End position of each line segment.
+        :param color: Color of the lines.
+        :param alpha: Opacity of the lines.
+        :param line_width: Width of the lines.
+        """
+
+        self.__update_object(object_type='lines', data=locals())
+
     def add_text(self,
                  content: str,
                  corner: str = 'BR',
