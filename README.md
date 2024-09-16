@@ -39,17 +39,17 @@ Additional SOFA features
 * an option to **render** the numerical simulation **completely automatically** given the **scene graph**;
 * an enhanced `Player` to **select** the **displayed models**.
 
-See more on the project [**documentation**](https://robinenjalbert.github.io/SimRender/).
+See more on the project [**documentation**](https://mimesis-inria.github.io/SimRender/).
 
 
 ## Install
 
 ``` bash
 # Option 1 (USERS): install with pip
-$ pip install git+https://github.com/RobinEnjalbert/SimRender.git
+$ pip install git+https://github.com/mimesis-inria/SimRender.git
 
 # Option 2 (DEVS): install as editable
-$ git clone https://github.com/RobinEnjalbert/SimRender.git
+$ git clone https://github.com/mimesis-inria/SimRender.git
 $ cd SimRender
 $ pip install -e .
 ```
@@ -57,4 +57,4 @@ $ pip install -e .
 
 ## Documentation
 
-See more ⟶ [**documentation**](https://robinenjalbert.github.io/SimRender/)
+See more ⟶ [**documentation**](https://mimesis-inria.github.io/SimRender/)
