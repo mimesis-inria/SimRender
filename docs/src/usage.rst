@@ -28,6 +28,9 @@ It is very similar to the previous viewer, except that it is always synchronous 
 to play / pause the simulation process and to navigate trough time steps.
 The storage of the past steps is automatically handled by the rendering process.
 
+.. note::
+    Press :guilabel:`b` key to switch between backgrounds !
+
 .. tabs::
 
     .. tab:: Viewer

@@ -12,6 +12,8 @@ The Core of this project is **compatible with any numerical simulation** written
 following list of features.
 **Additional cool features** are also available for :SOFA:`SOFA <>` **numerical simulations**.
 
+.. image:: _static/img/heart.gif
+
 
 Features
 --------
@@ -37,9 +39,7 @@ Additional SOFA features
 Gallery
 -------
 
-.. image:: _static/img/heart.gif
-
-.. image:: _static/img/logo.gif
+.. image:: _static/img/gallery.png
 
 
 

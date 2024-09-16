@@ -1,5 +1,8 @@
 # SimRender
 
+A **Python** library for **3D interactive rendering** of **numerical simulations**.
+
+![gallery](docs/src/_static/img/logo.gif)
 
 ## Presentation
 
