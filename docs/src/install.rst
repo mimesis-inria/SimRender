@@ -38,7 +38,7 @@ Install with *pip*
 
 .. code-block:: bash
 
-    $ pip install git+https://github.com/RobinEnjalbert/SimRender.git
+    $ pip install git+https://github.com/mimesis-inria/SimRender.git
 
 Then, you should be able to run:
 
@@ -53,7 +53,7 @@ Install from sources
 
 .. code-block:: bash
 
-    git clone https://github.com/RobinEnjalbert/SimRender.git
+    git clone https://github.com/mimesis-inria/SimRender.git
     cd SimRender
     pip install -e .
 

@@ -46,10 +46,10 @@ See more on the project [**documentation**](https://mimesis-inria.github.io/SimR
 
 ``` bash
 # Option 1 (USERS): install with pip
-$ pip install git+https://github.com/RobinEnjalbert/SimRender.git
+$ pip install git+https://github.com/mimesis-inria/SimRender.git
 
 # Option 2 (DEVS): install as editable
-$ git clone https://github.com/RobinEnjalbert/SimRender.git
+$ git clone https://github.com/mimesis-inria/SimRender.git
 $ cd SimRender
 $ pip install -e .
 ```
