@@ -3,8 +3,7 @@ from socket import socket, AF_INET, SOCK_STREAM
 from threading import Thread
 from subprocess import run
 from sys import executable
-
-from SimRender.core.remote import viewer_batch
+from os.path import dirname, join
 
 
 class ViewerBatch:
@@ -24,7 +23,8 @@ class ViewerBatch:
         """
 
         def __launch(ports: List[int]):
-            run([executable, viewer_batch.__file__, ' '.join([str(port) for port in ports])])
+            run([executable, join(dirname(dirname(__file__)), 'remote', 'viewer_batch.py'),
+                 ' '.join([str(port) for port in ports])])
 
         available_socket_ports = []
         for _ in range(nb_view):
