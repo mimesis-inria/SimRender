@@ -18,7 +18,7 @@ if __name__ == '__main__':
 
     # SOFA: run a few time steps
     # VIEWER: update the rendering
-    for i in range(1000):
+    while viewer.is_open:
         Sofa.Simulation.animate(root, root.dt.value)
         viewer.render()
 
