@@ -13,7 +13,7 @@ if __name__ == '__main__':
     player.launch()
 
     # Run some steps of the simulation
-    for _ in range(500):
+    while player.is_open:
         simu.step()
         player.render()
 

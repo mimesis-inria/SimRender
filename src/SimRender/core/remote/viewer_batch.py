@@ -88,7 +88,7 @@ if __name__ == '__main__':
     # Executed code when the visualization process is launched
     batch_socket_ports = [int(port) for port in sys.argv[1].split(' ')]
     win = ViewerBatch(socket_ports=batch_socket_ports)
+    win.showMaximized()
 
-    # sys.exit(app.exec())
     app.aboutToQuit.connect(win.on_close_event)
     app.exec()

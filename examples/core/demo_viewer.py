@@ -13,7 +13,7 @@ if __name__ == '__main__':
     viewer.launch()
 
     # Run some steps of the simulation
-    for _ in range(500):
+    while viewer.is_open:
         simu.step()
         viewer.render()
 

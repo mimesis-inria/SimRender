@@ -37,6 +37,10 @@ class Factory:
         self.__sync_arr = ndarray(shape=sync_array.shape, dtype=sync_array.dtype, buffer=self.__sync_sm.buf)
         self.__sync_arr[...] = sync_array[...]
 
+    @property
+    def is_open(self) -> bool:
+        return self.__sync_arr[0] == 0
+
     def init(self, batch_key: Optional[int]) -> int:
         """
         Initialize the local socket.
@@ -99,7 +103,7 @@ class Factory:
         self.__sync_arr[1] = 1
 
         # Wait for the remote process to be done (after several tests, it appears to be the faster way)
-        self.__remote.recv(4)
+        a = self.__remote.recv(4)
 
         # Turn the 'do_synchronize' shared flag off
         self.__sync_arr[1] = 0

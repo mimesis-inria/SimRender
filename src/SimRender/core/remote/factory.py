@@ -130,6 +130,10 @@ class Factory:
         Close the communication with the simulation process.
         """
 
+        # If the window is closed manually then turn the do_exit flag to True
+        if not self.__sync_arr[0]:
+            self.__sync_arr[0] = 1
+
         # Close the connection with the shared memories (synchronization array and each visual object array)
         self.__sync_sm.close()
         for memory in self.__memories:

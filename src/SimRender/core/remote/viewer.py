@@ -37,6 +37,7 @@ class Viewer(Plotter):
         # Launch the visualization window
         self.factory.listen()
         self.show(axes=4).close()
+        self.factory.close()
 
     def time_step(self, _) -> None:
         """

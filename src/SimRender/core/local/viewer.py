@@ -24,6 +24,10 @@ class Viewer:
         self._remote_script = viewer.__file__
 
     @property
+    def is_open(self) -> bool:
+        return self.__factory.is_open
+
+    @property
     def objects(self) -> Objects:
         """
         Access to visual objects creation and update methods.
