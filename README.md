@@ -17,8 +17,6 @@ following list of features.
 **Additional cool features** are also available for [**SOFA**](https://www.sofa-framework.org/) **numerical 
 simulations**.
 
-See more on the project [**documentation**]().
-
 
 ## Gallery
 
@@ -41,7 +39,7 @@ Additional SOFA features
 * an option to **render** the numerical simulation **completely automatically** given the **scene graph**;
 * an enhanced `Player` to **select** the **displayed models**.
 
-See more on the project [**documentation**]().
+See more on the project [**documentation**](https://robinenjalbert.github.io/SimRender/).
 
 
 ## Install
@@ -56,9 +54,7 @@ $ cd SimRender
 $ pip install -e .
 ```
 
-See more on the project [**documentation**]().
-
 
 ## Documentation
 
-Just in case you missed it ⟶ [**documentation**]()
+See more ⟶ [**documentation**](https://robinenjalbert.github.io/SimRender/)
