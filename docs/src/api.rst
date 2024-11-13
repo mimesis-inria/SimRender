@@ -29,9 +29,5 @@ SOFA
     :special-members: __init__
     :members: launch, render, shutdown
 
-.. autoclass:: SimRender.sofa.local.player.Player
-    :special-members: __init__
-    :members: launch, render, shutdown
-
 .. autoclass:: SimRender.sofa.local.factory.Objects
     :members: add_sofa_mesh, add_sofa_points, add_sofa_arrows, add_scene_graph
