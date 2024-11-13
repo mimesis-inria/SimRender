@@ -1,8 +1,8 @@
 import Sofa
 
 from SimRender.sofa import Viewer
-# from simulation_logo import Simulation
-from simulation_caduceus import Simulation
+from simulation_logo import Simulation
+# from simulation_caduceus import Simulation
 
 
 if __name__ == '__main__':
