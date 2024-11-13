@@ -1,0 +1,157 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="./">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Project Details &mdash; SimRender  documentation</title>
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=e59714d7" />
+      <link rel="stylesheet" type="text/css" href="_static/copybutton.css?v=76b2166b" />
+      <link rel="stylesheet" type="text/css" href="_static/theme.css?v=556d74e5" />
+
+  
+      <script src="_static/jquery.js?v=5d32c60e"></script>
+      <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="_static/documentation_options.js?v=5929fcd5"></script>
+      <script src="_static/doctools.js?v=9bcbadda"></script>
+      <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script src="_static/clipboard.min.js?v=a7894cd8"></script>
+      <script src="_static/copybutton.js?v=f281be69"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="author" title="About these documents" href="#" />
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Getting started" href="usage.html" />
+    <link rel="prev" title="Install" href="install.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="index.html" class="icon icon-home">
+            SimRender
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="install.html">Install</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">About</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#global-structure">Global Structure</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#viewer">Viewer</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#factory">Factory</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#memory">Memory</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="usage.html">Getting started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="api.html">API</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">SimRender</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">Project Details</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/about.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="project-details">
+<h1>Project Details<a class="headerlink" href="#project-details" title="Link to this heading"></a></h1>
+<section id="global-structure">
+<h2>Global Structure<a class="headerlink" href="#global-structure" title="Link to this heading"></a></h2>
+<p>The main feature of <strong>SimRender</strong> is to provide an interactive 3D rendering window to render a running numerical
+simulation without blocking the execution of the python process.
+This is achieved using two different python processes: the first one is the main process launch by the user (called
+<em>local process</em> in the documentation), from which an other subprocess is launched to display the interactive 3D
+rendering window (called <em>remote process</em> in the documentation).</p>
+<figure class="align-center">
+<img alt="_images/structure.png" src="_images/structure.png" />
+</figure>
+</section>
+<section id="viewer">
+<h2>Viewer<a class="headerlink" href="#viewer" title="Link to this heading"></a></h2>
+<p>As shown in the figure above, the <em>local Viewer</em> is used in the simulation process and the <em>remote Viewer</em> is dedicated
+to the 3D rendering window.</p>
+<p>The <em>local Viewer</em> is a simple user interface to launch, render and close the 3D rendering.
+The <em>local Factory</em> is accessible through this interface to create and update 3D objects with simulated data.</p>
+<p>The <em>remote Viewer</em> runs in a dedicated python <a class="reference external" href="https://docs.python.org/3/library/subprocess.html">subprocess</a>.
+It creates and display the 3D objects using <a class="reference external" href="https://vedo.embl.es/">vedo</a>, getting data through the <em>remote Factory</em>.
+A timer callback is checking for new rendering steps in the <em>remote Factory</em> so that the rendering window remains
+interactive.</p>
+</section>
+<section id="factory">
+<h2>Factory<a class="headerlink" href="#factory" title="Link to this heading"></a></h2>
+<p><em>Factories</em> are used to synchronize the <em>Viewers</em> and the access shared data between processes.</p>
+<p>The <em>local Factory</em> is a simple user interface to init and update the visualization data fields for several 3D object
+types (point clouds, meshes, arrows, lines and 2D text).</p>
+<p>Then, the <em>remote Factory</em> will access these data fields to create and update the 3D objects in the <em>remote Viewer</em>.</p>
+</section>
+<section id="memory">
+<h2>Memory<a class="headerlink" href="#memory" title="Link to this heading"></a></h2>
+<p>The <em>Memories</em> are the shared access to data between the <em>local</em> and the <em>remote</em> processes.
+A <a class="reference external" href="https://docs.python.org/3/library/multiprocessing.shared_memory.html">SharedMemory</a> is created for each data field
+and used as buffer for a <a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html">numpy array</a>.</p>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="install.html" class="btn btn-neutral float-left" title="Install" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="usage.html" class="btn btn-neutral float-right" title="Getting started" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2024, Mimesis, Inria.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

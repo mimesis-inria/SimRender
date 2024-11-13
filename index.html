@@ -1,0 +1,153 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="./">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>SimRender &mdash; SimRender  documentation</title>
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=e59714d7" />
+      <link rel="stylesheet" type="text/css" href="_static/copybutton.css?v=76b2166b" />
+      <link rel="stylesheet" type="text/css" href="_static/theme.css?v=556d74e5" />
+
+  
+      <script src="_static/jquery.js?v=5d32c60e"></script>
+      <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="_static/documentation_options.js?v=5929fcd5"></script>
+      <script src="_static/doctools.js?v=9bcbadda"></script>
+      <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script src="_static/clipboard.min.js?v=a7894cd8"></script>
+      <script src="_static/copybutton.js?v=f281be69"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="author" title="About these documents" href="about.html" />
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Install" href="install.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="#" class="icon icon-home">
+            SimRender
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="install.html">Install</a></li>
+<li class="toctree-l1"><a class="reference internal" href="about.html">About</a></li>
+<li class="toctree-l1"><a class="reference internal" href="usage.html">Getting started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="api.html">API</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="#">SimRender</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="#" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">SimRender</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/index.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="simrender">
+<h1>SimRender<a class="headerlink" href="#simrender" title="Link to this heading"></a></h1>
+<p><strong>SimRender</strong> is a Python module for creating <strong>3D renderings</strong> of <strong>numerical simulations</strong> in a <strong>very few lines of
+code</strong>.</p>
+<p>The main feature is that users can launch an <strong>interactive 3D rendering window without blocking</strong> the execution of the
+python process.</p>
+<p>The project is <strong>compatible with any numerical simulation</strong> written in Python and provides the
+following list of features.
+<strong>Additional features</strong> are also compatible with <a class="extlink-SOFA reference external" href="https://www.sofa-framework.org/">SOFA</a> <strong>numerical simulations</strong>.</p>
+<img alt="_images/heart.gif" src="_images/heart.gif" />
+<section id="features">
+<h2>Features<a class="headerlink" href="#features" title="Link to this heading"></a></h2>
+<p>Main features:</p>
+<ul class="simple">
+<li><p>a <strong>simple API</strong> to create and update visual objects from simulated data;</p></li>
+<li><p>several <strong>customizable visual objects</strong>: meshes, point clouds, arrows, lines, 2D text;</p></li>
+<li><dl class="simple">
+<dt>several available <strong>viewers</strong>:</dt><dd><ul>
+<li><p><cite>Viewer</cite>: a simple rendering window to render the current state of a <strong>single</strong> numerical simulation;</p></li>
+<li><p><cite>ViewerBatch</cite>: an advanced rendering window to render the current state of <strong>several</strong> numerical simulations
+<strong>simultaneously</strong>;</p></li>
+<li><p><cite>Player</cite>: an advanced rendering window to <strong>navigate</strong> through the numerical simulation <strong>time steps</strong> (play/pause,
+back/forth).</p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ul>
+<p>SOFA compatible features:</p>
+<ul class="simple">
+<li><p>an enhanced API to <strong>update</strong> visual objects <strong>automatically</strong> with Data callbacks;</p></li>
+<li><p>an option to <strong>render</strong> the numerical simulation <strong>completely automatically</strong> given the <strong>scene graph</strong>;</p></li>
+<li><p>an enhanced <cite>Player</cite> to <strong>select</strong> the <strong>displayed models</strong> (incoming).</p></li>
+</ul>
+</section>
+<section id="gallery">
+<h2>Gallery<a class="headerlink" href="#gallery" title="Link to this heading"></a></h2>
+<img alt="_images/gallery.png" src="_images/gallery.png" />
+<div class="toctree-wrapper compound">
+</div>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="install.html" class="btn btn-neutral float-right" title="Install" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2024, Mimesis, Inria.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>
