@@ -30,7 +30,9 @@ class PlayerQt(QMainWindow):
         # Add the menu
 
         # Display
-        self.plt.launch()
+        self.plt.factory.listen()
+        self.plt.show(axes=4)
+        self.plt.render()
         self.layout.addWidget(self.vtk_widget)
         self.frame.setLayout(self.layout)
         self.setCentralWidget(self.frame)
@@ -47,9 +49,9 @@ if __name__ == '__main__':
 
     # Executed code when the visualization process is launched
     from sys import argv
-    # Player(socket_port=int(argv[1])).launch()
+    Player(socket_port=int(argv[1])).launch()
 
-    app = QApplication([])
-    win = PlayerQt(socket_port=int(argv[1]))
-    app.aboutToQuit.connect(win.on_close_event())
-    app.exec()
+    # app = QApplication([])
+    # win = PlayerQt(socket_port=int(argv[1]))
+    # app.aboutToQuit.connect(win.on_close_event())
+    # app.exec()>

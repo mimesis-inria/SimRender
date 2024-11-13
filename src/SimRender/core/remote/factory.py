@@ -135,7 +135,11 @@ class Factory:
             self.__sync_arr[0] = 1
 
         # Close the connection with the shared memories (synchronization array and each visual object array)
-        self.__sync_sm.close()
+        try:
+            self.__sync_sm.close()
+        except OSError:
+            pass
+
         for memory in self.__memories:
             memory.close()
 

@@ -15,8 +15,8 @@ class Viewer(_Viewer):
 
         :param root_node: Root node of the SOFA scene graph.
         :param sync: If True, the rendering step will block the python code execution. Otherwise, the viewer will only
-        render the current status of the simulation. Use it if you want to make sure that all your simulation steps are
-        rendered.
+                     render the current status of the simulation. Use it if you want to make sure that all your
+                     simulation steps are rendered.
         """
 
         # Create a Factory to manage visual objects and remote communication
