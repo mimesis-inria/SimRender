@@ -4,8 +4,8 @@
 #	LightWave3D OBJ Export v2.3
 #
 ####
-o snake_yellowEye.obj
-mtllib snake_yellowEye.mtl
+o snake_eye.obj
+mtllib snake_eye.mtl
 g default
 v 1.90815 44.8349 8.8378
 v 1.69896 44.7542 8.98372

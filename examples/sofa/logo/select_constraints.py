@@ -40,7 +40,6 @@ class MeshSelector(Plotter):
         self.id_cursor = -1
 
         # Create mouse and keyboard callbacks
-        self.add_callback('KeyPress', self.__callback_key_press)
         self.add_callback('MouseMove', self.__callback_mouse_move)
         self.add_callback('LeftButtonPress', self.__callback_left_click)
         self.add_callback('RightButtonPress', self.__callback_right_click)
@@ -54,10 +53,7 @@ class MeshSelector(Plotter):
         self.render()
         instructions = "MOUSE CONTROL\n" \
                        "  Left-click to select a point.\n" \
-                       "  Right-click to unselect a point.\n\n" \
-                       "KEYBOARD CONTROL\n" \
-                       "  Press 'z' to remove the last selected point.\n" \
-                       "  Press 'c' to clear the selection."
+                       "  Right-click to unselect a point.\n"
         self.add(Text2D(txt=instructions, pos='top-left', s=0.6, bg='grey', c='white', alpha=0.9))
         self.add(self.indicator)
 
@@ -68,9 +64,7 @@ class MeshSelector(Plotter):
         # Launch Plotter
         self.show(**kwargs).close()
 
-    def save(self,
-             file: Optional[str] = None,
-             overwrite: bool = False):
+    def save(self, file: Optional[str] = None, overwrite: bool = False):
         """
         Save the current selection.
         """
@@ -123,21 +117,6 @@ class MeshSelector(Plotter):
         self.pts.pointcolors = mesh_color
         self.render()
 
-    def __callback_key_press(self, event):
-        """
-        KeyPressEvent callback.
-        """
-
-        # If 'z' pressed, remove the last selected cell
-        if event.keypress == 'z' and len(self.selection) > 0:
-            self.selection.pop()
-            self.__update()
-
-        # If 'c' pressed, clear the selection
-        elif event.keypress == 'c':
-            self.selection = []
-            self.__update()
-
     def __callback_mouse_move(self, event):
         """
         MouseMoveEvent callback.
@@ -183,10 +162,10 @@ if __name__ == '__main__':
 
     for file in ['constraints', 'forces']:
 
-        if not exists(f := f'{file}.npy'):
+        if not exists(f := join('data', f'{file}.npy')):
             save(f, array([]))
 
-        plt = MeshSelector(mesh_file='volume.vtk',
+        plt = MeshSelector(mesh_file=join('data', 'volume.vtk'),
                            selection_file=f)
-        plt.launch(title=f'{file}_selection')
+        plt.launch(title=file.upper())
         plt.save(overwrite=True)

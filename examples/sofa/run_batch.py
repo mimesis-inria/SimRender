@@ -1,12 +1,17 @@
+from sys import argv
+from importlib import import_module
 import Sofa
 
 from SimRender.core import ViewerBatch
 from SimRender.sofa import Viewer
 
-from simulation_logo import Simulation
-
 
 if __name__ == '__main__':
+
+    scene = 'caduceus'
+    if len(argv) == 2 and argv[1].lower() in ['caduceus', 'logo', 'tripod']:
+        scene = argv[1].lower()
+    simulation = import_module(scene)
 
     # VIEWER: create and start the rendering
     batch = ViewerBatch()
@@ -16,8 +21,8 @@ if __name__ == '__main__':
     # SOFA: create and init the scene graph
     # VIEWER: associate a standard viewer for each simulation
     root = [Sofa.Core.Node() for _ in range(nb_simu)]
-    simu = [root[i].addObject(Simulation(root=root[i], id_simu=i)) for i in range(nb_simu)]
-    view = [Viewer(root_node=root[i]) for i in range(nb_simu)]
+    simu = [r.addObject(simulation.Simulation(root=r)) for r in root]
+    view = [Viewer(root_node=r) for r in root]
     for i in range(nb_simu):
         Sofa.Simulation.init(root[i])
         view[i].objects.add_scene_graph()

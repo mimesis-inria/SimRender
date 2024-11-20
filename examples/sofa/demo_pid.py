@@ -2,7 +2,7 @@ import numpy as np
 import Sofa
 
 from SimRender.sofa import Viewer
-from simulation_logo import Simulation
+from examples.sofa.logo.scene import Simulation
 
 
 class Controller:
