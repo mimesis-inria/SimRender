@@ -20,7 +20,7 @@ if __name__ == '__main__':
     # VIEWER: create the viewer, create objects and start the rendering
     viewer = Viewer(root_node=root, sync=False)
     viewer.objects.add_scene_graph(visual_models=True,
-                                   behavior_models=True,
+                                   behavior_models=scene != 'tripod',
                                    force_fields=True,
                                    collision_models=False)
     viewer.launch()

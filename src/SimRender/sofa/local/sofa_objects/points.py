@@ -29,7 +29,7 @@ class PointCollisionModel(Points):
         return super().update()
 
 
-class FixedConstraint(Points):
+class FixedProjectiveConstraint(Points):
 
     def __init__(self, sofa_object: Sofa.Core.Object):
 
@@ -40,7 +40,7 @@ class FixedConstraint(Points):
 
         # Position
         self.positions = self.sofa_node.getMechanicalState().getData('position').value
-        self.positions = self.positions[self.sofa_object.getData('indices').value]
+        self.positions = self.positions[self.sofa_object.getData('indices').value, :3]
         # Color & alpha
         self.alpha = 0.9
         self.color = 'red4'
