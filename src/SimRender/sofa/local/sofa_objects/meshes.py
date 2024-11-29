@@ -1,102 +1,79 @@
 from typing import Dict, Any
 import Sofa
 
-from SimRender.sofa.local.sofa_objects.base import Mesh
+from SimRender.sofa.local.sofa_objects.base import Object
 
 
-class OglModel(Mesh):
+class OglModel(Object):
 
     def __init__(self, sofa_object: Sofa.Core.Object):
 
         super().__init__(sofa_object=sofa_object)
-        self.display_model = 'visual'
+        self.object_type = 'mesh'
+        self.display_model = 'visual_model'
 
     def create(self) -> Dict[str, Any]:
 
-        # Position
-        self.positions = self.sofa_object.getData('position').value
-        # Cells
-        self.cells = []
+        cells = []
         for topology in ['triangles', 'quads']:
-            cells = self.sofa_object.getData(topology).value
-            if len(cells) > 0:
-                self.cells += cells.tolist()
-        # Color & alpha
-        material = self.sofa_object.getData('material').value
-        color = material.split('Diffuse')[1].split('Ambient')[0].split(' ')[2:-1]
-        self.alpha = max(0.1, float(color[-1]))
-        self.color = [float(c) for c in color[:-1]]
-        # Wireframe & line width
-        self.wireframe = False
-        self.line_width = 0
-        # Texture
-        self.texture_name = self.sofa_object.getData('texturename').value
-        self.texture_coords = self.sofa_object.getData('texcoords').value
-        return super().create()
+            cells += self.sofa_object.getData(topology).value.tolist()
+        color = self.sofa_object.getData('material').value.split('Diffuse')[1].split('Ambient')[0].split(' ')[2: -1]
+        return {'positions': self.sofa_object.getData('position').value,
+                'cells': cells,
+                'color': [float(c) for c in color[:-1]],
+                'alpha': max(0.1, float(color[-1])),
+                'wireframe': False,
+                'line_width': 0.,
+                'texture_name': self.sofa_object.getData('texturename').value,
+                'texture_coords': self.sofa_object.getData('texcoords').value}
 
     def update(self) -> Dict[str, Any]:
 
-        # Position
-        self.positions = self.sofa_object.getData('position').value
-        # Color & alpha
-        material = self.sofa_object.getData('material').value
-        color = material.split('Diffuse')[1].split('Ambient')[0].split(' ')[2:-1]
-        self.alpha = max(0.1, float(color[-1]))
-        self.color = [float(c) for c in color[:-1]]
-        return super().update()
+        color = self.sofa_object.getData('material').value.split('Diffuse')[1].split('Ambient')[0].split(' ')[2: -1]
+        return {'positions': self.sofa_object.getData('position').value,
+                'color': [float(c) for c in color[:-1]],
+                'alpha': max(0.1, float(color[-1]))}
 
 
-class TriangleCollisionModel(Mesh):
+class TriangleCollisionModel(Object):
 
     def __init__(self, sofa_object: Sofa.Core.Object):
 
         super().__init__(sofa_object=sofa_object)
-        self.display_model = 'collision'
+        self.object_type = 'mesh'
+        self.display_model = 'collision_model'
 
     def create(self) -> Dict[str, Any]:
 
-        # Position
-        self.positions = self.sofa_node.getMechanicalState().getData('position').value
-        # Cells
-        self.cells = self.sofa_object.findLink('topology').getLinkedBase().getData('triangles').value
-        # Color & alpha
-        self.alpha = 1.
-        self.color = 'orange5'
-        # Wireframe & line width
-        self.wireframe = True
-        self.line_width = 2
-        return super().create()
+        return {'positions': self.sofa_node.getMechanicalState().getData('position').value,
+                'cells': self.sofa_object.findLink('topology').getLinkedBase().getData('triangles').value,
+                'color': 'orange5',
+                'alpha': 1.,
+                'wireframe': True,
+                'line_width': 2.}
 
     def update(self) -> Dict[str, Any]:
 
-        # Position
-        self.positions = self.sofa_node.getMechanicalState().getData('position').value
-        return super().update()
+        return {'positions': self.sofa_node.getMechanicalState().getData('position').value}
 
 
-class LineCollisionModel(Mesh):
+class LineCollisionModel(Object):
 
     def __init__(self, sofa_object: Sofa.Core.Object):
 
         super().__init__(sofa_object=sofa_object)
-        self.display_model = 'collision'
+        self.object_type = 'mesh'
+        self.display_model = 'collision_model'
 
     def create(self) -> Dict[str, Any]:
 
-        # Position
-        self.positions = self.sofa_node.getMechanicalState().getData('position').value
-        # Cells
-        self.cells = self.sofa_object.findLink('topology').getLinkedBase().getData('edges').value
-        # Color & alpha
-        self.alpha = 1.
-        self.color = 'orange5'
-        # Wireframe & line width
-        self.wireframe = True
-        self.line_width = 2
-        return super().create()
+        return {'positions': self.sofa_node.getMechanicalState().getData('position').value,
+                'cells': self.sofa_object.findLink('topology').getLinkedBase().getData('edges').value,
+                'color': 'orange5',
+                'alpha': 1.,
+                'wireframe': True,
+                'line_width': 2.}
 
     def update(self) -> Dict[str, Any]:
 
-        # Position
-        self.positions = self.sofa_node.getMechanicalState().getData('position').value
-        return super().update()
+        return {'positions': self.sofa_node.getMechanicalState().getData('position').value}
