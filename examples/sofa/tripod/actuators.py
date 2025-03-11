@@ -1,6 +1,5 @@
 from os.path import dirname, join
 import Sofa, SofaRuntime
-from stlib3.visuals import VisualModel
 
 
 data_dir = join(dirname(__file__), 'data')
@@ -81,9 +80,10 @@ class ServoArm(Sofa.Prefab):
     def set_rigid_mapping(self, path):
 
         self.addObject('RigidMapping', name='mapping', input=path, index=self.indexInput.value)
-        visual = self.addChild(VisualModel(visualMeshPath=join(data_dir, 'SG90_servoarm.stl'),
-                                           translation=[0., -25., 0.], color=[1., 1., 1., 0.3]))
-        visual.OglModel.writeZTransparent = True
+        visual = self.addChild('visual')
+        visual.addObject('MeshSTLLoader', name='loader', filename=join(data_dir, 'SG90_servoarm.stl'))
+        visual.addObject('OglModel', name="OglModel", src="@loader", translation=[0., -25., 0.],
+                       color=[1., 1., 1., 0.3], updateNormals=False, writeZTransparent=True)
         visual.addObject('RigidMapping', name='mapping')
 
 
@@ -112,5 +112,5 @@ class ActuatedArm(Sofa.Prefab):
                                                     rotation=self.rotation.value))
         self.servo_arm = self.servo_motor.Articulation.ServoWheel.addChild(ServoArm(name="ServoArm"))
         self.servo_arm.set_rigid_mapping(self.ServoMotor.Articulation.ServoWheel.dofs.getLinkPath())
-        self.ServoMotor.angleIn.setParent(self.angleIn)
+        self.servo_motor.angleIn.setParent(self.angleIn)
         self.angleOut.setParent(self.ServoMotor.angleOut)

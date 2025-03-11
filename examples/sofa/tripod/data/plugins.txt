@@ -1,5 +1,6 @@
 ArticulatedSystemPlugin
 Sofa.Component.AnimationLoop
+Sofa.Component.Collision.Geometry
 Sofa.Component.Constraint.Lagrangian.Correction
 Sofa.Component.Constraint.Lagrangian.Solver
 Sofa.Component.Constraint.Projective

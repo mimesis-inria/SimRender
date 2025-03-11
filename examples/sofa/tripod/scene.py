@@ -31,8 +31,9 @@ class Simulation(Sofa.Core.Controller):
         with open(join(data_dir, 'plugins.txt'), 'r') as f:
             required_plugins = [plugin[:-1] if plugin.endswith('\n') else plugin for plugin in f.readlines()
                                 if plugin != '\n']
+        root.addObject('RequiredPlugin', pluginName=required_plugins)
 
-        scene = Scene(root, gravity=[0., -9810., 0.], dt=0.01, iterative=False, plugins=required_plugins)
+        scene = Scene(root, gravity=[0., -9810., 0.], dt=0.01, iterative=False)
         scene.addMainHeader()
         scene.addObject('DefaultVisualManagerLoop')
         scene.addObject('FreeMotionAnimationLoop')

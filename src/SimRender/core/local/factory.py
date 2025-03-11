@@ -30,7 +30,7 @@ class Factory:
         self.__remote: Optional[socket] = None
 
         # Define the synchronization function if required, otherwise add a manual delay (minimal synchronization)
-        self.__sync_fct = self.__sync if sync else lambda: sleep(0.002)
+        self.__sync_fct = self.__sync if sync else lambda: sleep(1e-6)
         # Create a shared numpy array for synchronization with format [do_exit, do_synchronize, step_counter]
         sync_array = array([0, 0, 0], dtype=int)
         self.__sync_sm = SharedMemory(create=True, size=sync_array.nbytes)
@@ -55,7 +55,7 @@ class Factory:
         else:
             # Disable sync for batch mode
             if self.__sync_fct == self.__sync:
-                self.__sync_fct = lambda: sleep(0.002)
+                self.__sync_fct = lambda: None
                 print('Warning: Synchronization is not available for Viewer in batch mode '
                       '(automatically turned "sync" parameter to False)')
             self.__socket.bind(('localhost', batch_key))

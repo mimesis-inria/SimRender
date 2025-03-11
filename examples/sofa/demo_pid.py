@@ -2,14 +2,14 @@ import numpy as np
 import Sofa
 
 from SimRender.sofa import Viewer
-from examples.sofa.logo.scene import Simulation
+from logo.scene import Simulation
 
 
 class Controller:
 
-    def __init__(self, kp: float, ki: float, kd: float, sim: Simulation, targets: np.ndarray):
+    def __init__(self, kp: float, ki: float, kd: float, root: Sofa.Core.Node, targets: np.ndarray):
 
-        self.root = sim.root
+        self.root = root
         self.targets = targets
 
         self.kp = kp
@@ -59,7 +59,7 @@ if __name__ == '__main__':
     targets = np.array([[2.25, 5., 1.5], [1., 11.5, -1.5], [7., 13., 1.75], [11., 10., -2.]])
 
     # PID
-    pid = Controller(kp=0.1, ki=0.02, kd=1.0, sim=simu, targets=targets)
+    pid = Controller(kp=0.1, ki=0.02, kd=1.0, root=root, targets=targets)
 
     # VIEWER: create the viewer, create objects and start the rendering
     viewer = Viewer(root_node=root, sync=False)

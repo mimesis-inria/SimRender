@@ -27,7 +27,7 @@ class Simulation(Sofa.Core.Controller):
         root.addObject('BruteForceBroadPhase')
         root.addObject('BVHNarrowPhase')
         root.addObject('DiscreteIntersection')
-        root.addObject('DefaultContactManager')
+        root.addObject('CollisionResponse')
 
         root.addChild('logo')
         root.logo.addObject('EulerImplicitSolver', firstOrder=False, rayleighMass=0.1, rayleighStiffness=0.1)

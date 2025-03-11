@@ -16,7 +16,7 @@ if __name__ == '__main__':
 
     root = Sofa.Core.Node('root')
     createScene(root)
-    Sofa.Simulation.init(root)
+    Sofa.Simulation.initRoot(root)
 
     Sofa.Gui.GUIManager.Init(program_name="main", gui_name="qglviewer")
     Sofa.Gui.GUIManager.createGUI(root, __file__)
