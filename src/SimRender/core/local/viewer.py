@@ -35,6 +35,9 @@ class Viewer:
 
         return self.__factory.objects
 
+    def len(self):
+        return self.__factory.memories
+
     def launch(self, batch_key: Optional[int] = None) -> None:
         """
         Launch the rendering window in its own python process.

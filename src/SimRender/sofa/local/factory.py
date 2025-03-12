@@ -4,7 +4,7 @@ from numpy import array, ndarray, nan, tile
 
 from SimRender.core.local.factory import Factory as _Factory, Objects as _Objects
 from SimRender.sofa.local.scene_graph import SceneGraph
-from SimRender.sofa.local.sofa_objects import SOFA_OBJECTS, Base
+from SimRender.sofa.local.sofa_objects import collection, Object
 
 
 class Factory(_Factory):
@@ -20,7 +20,7 @@ class Factory(_Factory):
         super().__init__(sync=sync)
 
         self.objects = Objects(root_node=root_node, factory=self)
-        self.callbacks: Dict[int, Base] = {}
+        self.callbacks: Dict[int, Object] = {}
 
     def update(self) -> None:
 
@@ -44,6 +44,7 @@ class Objects(_Objects):
 
         self.__factory = factory
         self.__scene_graph = SceneGraph(root_node=root_node)
+        self.__SOFA_OBJECTS = collection()
 
     def add_sofa_mesh(self,
                       positions_data: Sofa.Core.Data,
@@ -217,9 +218,9 @@ class Objects(_Objects):
 
         # Check if the component is implemented
         object_class = sofa_object.getClassName()
-        if object_class in SOFA_OBJECTS:
+        if object_class in self.__SOFA_OBJECTS:
 
-            data_wrapper = SOFA_OBJECTS[object_class](sofa_object=sofa_object)
+            data_wrapper = self.__SOFA_OBJECTS[object_class](sofa_object=sofa_object)
             func = self.__getattribute__(f'add_{data_wrapper.object_type}')
             idx = func(**data_wrapper.create())
             self.__factory.callbacks[idx] = data_wrapper
@@ -227,7 +228,7 @@ class Objects(_Objects):
 
         else:
             print(f"WARNING: Could not create a 3D object for this component as the class representation is not"
-                  f"implemented. Available components are {SOFA_OBJECTS.keys()}.")
+                  f"implemented. Available components are {self.__SOFA_OBJECTS.keys()}.")
 
     def add_scene_graph(self,
                         visual_models: bool = True,
@@ -243,8 +244,8 @@ class Objects(_Objects):
         :param collision_models: If True, display each detected collision model in the scene graph.
         """
 
-        display_models = {'visual': visual_models, 'behavior': behavior_models,
-                          'force': force_fields, 'collision': collision_models}
+        display_models = {'visual_model': visual_models, 'behavior_model': behavior_models,
+                          'force_field': force_fields, 'collision_model': collision_models}
 
         # Process each sofa object in the scene graph
         for key, sofa_object in self.__scene_graph.graph.items():
@@ -258,8 +259,8 @@ class Objects(_Objects):
                 # TODO: apply the display flags
 
             # Check if a configuration exists for the object
-            elif object_class in SOFA_OBJECTS:
-                data_wrapper = SOFA_OBJECTS[object_class](sofa_object=sofa_object)
+            elif object_class in self.__SOFA_OBJECTS:
+                data_wrapper = self.__SOFA_OBJECTS[object_class](sofa_object=sofa_object)
                 if display_models[data_wrapper.display_model]:
                     func = self.__getattribute__(f'add_{data_wrapper.object_type}')
                     idx = func(**data_wrapper.create())

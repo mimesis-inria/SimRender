@@ -297,7 +297,7 @@ Automated scene graph detection
 """""""""""""""""""""""""""""""
 
 The :py:class:`viewer.objects<SimRender.sofa.local.factory.Objects>` also has an additional method to automatically
-create and update some SOFA components: :py:meth:`update_mesh<SimRender.sofa.local.factory.Objects.add_scene_graph>`.
+create and update some SOFA components: :py:meth:`add_scene_graph<SimRender.sofa.local.factory.Objects.add_scene_graph>`.
 The scene graph is explored to detect component types in a pre-defined list (soon extended):
 
     +------------------------+-----------------------------------------------------------------+

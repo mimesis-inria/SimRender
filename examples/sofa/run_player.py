@@ -1,15 +1,20 @@
+from sys import argv
+from importlib import import_module
 import Sofa
 
 from SimRender.sofa import Player
-# from simulation_logo import Simulation
-from simulation_caduceus import Simulation
 
 
 if __name__ == '__main__':
 
+    scene = 'caduceus'
+    if len(argv) == 2 and argv[1].lower() in ['caduceus', 'logo', 'tripod']:
+        scene = argv[1].lower()
+    simulation = import_module(scene)
+
     # SOFA: create and init the scene graph
     root = Sofa.Core.Node()
-    simu = root.addObject(Simulation(root=root))
+    simu = root.addObject(simulation.Simulation(root))
     Sofa.Simulation.init(root)
 
     # VIEWER: create the player, create objects and start the rendering
