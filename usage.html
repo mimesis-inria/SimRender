@@ -1,0 +1,462 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="./">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Getting started &mdash; SimRender  documentation</title>
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=e59714d7" />
+      <link rel="stylesheet" type="text/css" href="_static/copybutton.css?v=76b2166b" />
+      <link rel="stylesheet" type="text/css" href="_static/tabs.css?v=a5c4661c" />
+      <link rel="stylesheet" type="text/css" href="_static/theme.css?v=556d74e5" />
+
+  
+      <script src="_static/jquery.js?v=5d32c60e"></script>
+      <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="_static/documentation_options.js?v=5929fcd5"></script>
+      <script src="_static/doctools.js?v=9bcbadda"></script>
+      <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script src="_static/clipboard.min.js?v=a7894cd8"></script>
+      <script src="_static/copybutton.js?v=f281be69"></script>
+      <script src="_static/tabs.js?v=3030b3cb"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="author" title="About these documents" href="about.html" />
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="API" href="api.html" />
+    <link rel="prev" title="Project Details" href="about.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="index.html" class="icon icon-home">
+            SimRender
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="install.html">Install</a></li>
+<li class="toctree-l1"><a class="reference internal" href="about.html">About</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Getting started</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#create-a-viewer">Create a Viewer</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#viewer-player">Viewer / Player</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#batch">Batch</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#create-and-update-3d-objects">Create and update 3D objects</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#create-objects">Create objects</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#update-objects">Update objects</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#using-sofa-simulations">Using SOFA simulations</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#automated-updates">Automated updates</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#automated-scene-graph-detection">Automated scene graph detection</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="api.html">API</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">SimRender</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">Getting started</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/usage.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="getting-started">
+<h1>Getting started<a class="headerlink" href="#getting-started" title="Link to this heading"></a></h1>
+<p>This light tutorial reviews the whole project API to create, update and render 3D objects from numerical simulation data.</p>
+<section id="create-a-viewer">
+<h2>Create a Viewer<a class="headerlink" href="#create-a-viewer" title="Link to this heading"></a></h2>
+<p>Three viewer options are available depending on the requirements.
+The <a class="reference internal" href="api.html#SimRender.core.local.viewer.Viewer" title="SimRender.core.local.viewer.Viewer"><code class="xref py py-class docutils literal notranslate"><span class="pre">Viewer</span></code></a> and the <a class="reference internal" href="api.html#SimRender.core.local.player.Player" title="SimRender.core.local.player.Player"><code class="xref py py-class docutils literal notranslate"><span class="pre">Player</span></code></a>
+have exactly the same API, while the <a class="reference internal" href="api.html#SimRender.core.local.viewer_batch.ViewerBatch" title="SimRender.core.local.viewer_batch.ViewerBatch"><code class="xref py py-class docutils literal notranslate"><span class="pre">ViewerBatch</span></code></a> is used to
+gather several <a class="reference internal" href="api.html#SimRender.core.local.viewer.Viewer" title="SimRender.core.local.viewer.Viewer"><code class="xref py py-class docutils literal notranslate"><span class="pre">Viewers</span></code></a> in a single display window.</p>
+<section id="viewer-player">
+<h3>Viewer / Player<a class="headerlink" href="#viewer-player" title="Link to this heading"></a></h3>
+<p>The <a class="reference internal" href="api.html#SimRender.core.local.viewer.Viewer" title="SimRender.core.local.viewer.Viewer"><code class="xref py py-class docutils literal notranslate"><span class="pre">Viewer</span></code></a> is used to simply render a unique numerical simulation at
+runtime.
+By default, the simulation process and the rendering process are asynchronous, allowing to run the numerical simulation
+as fast as possible while rendering it’s current state in real time.
+It is possible to synchronize these processes to ensure that every single simulation step will be rendered.</p>
+<p>The <a class="reference internal" href="api.html#SimRender.core.local.player.Player" title="SimRender.core.local.player.Player"><code class="xref py py-class docutils literal notranslate"><span class="pre">Player</span></code></a> is used to animate a unique numerical simulation.
+It is very similar to the previous viewer, except that it is always synchronous and adds widgets in the display window
+to play / pause the simulation process and to navigate trough time steps.
+The storage of the past steps is automatically handled by the rendering process.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Press <span class="guilabel">b</span> key to switch between backgrounds !</p>
+</div>
+<div class="sphinx-tabs docutils container">
+<div aria-label="Tabbed content" class="closeable" role="tablist"><button aria-controls="panel-0-0-0" aria-selected="true" class="sphinx-tabs-tab" id="tab-0-0-0" name="0-0" role="tab" tabindex="0">Viewer</button><button aria-controls="panel-0-0-1" aria-selected="false" class="sphinx-tabs-tab" id="tab-0-0-1" name="0-1" role="tab" tabindex="-1">Player</button></div><div aria-labelledby="tab-0-0-0" class="sphinx-tabs-panel" id="panel-0-0-0" name="0-0" role="tabpanel" tabindex="0"><div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">SimRender.core</span> <span class="kn">import</span> <span class="n">Viewer</span>
+
+<span class="c1"># Create the viewer</span>
+<span class="n">viewer</span> <span class="o">=</span> <span class="n">Viewer</span><span class="p">(</span><span class="n">sync</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+
+<span class="c1"># Create 3D object --&gt; see the dedicated section bellow</span>
+<span class="o">...</span>
+
+<span class="c1"># Launch the rendering process</span>
+<span class="n">viewer</span><span class="o">.</span><span class="n">launch</span><span class="p">()</span>
+
+<span class="c1"># Process any Python script</span>
+<span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">N</span><span class="p">):</span>
+
+    <span class="c1"># Step of simulation, update 3D object --&gt; see the dedicated section bellow</span>
+    <span class="o">...</span>
+
+    <span class="c1"># Render the current state of the simulation</span>
+    <span class="n">viewer</span><span class="o">.</span><span class="n">render</span><span class="p">()</span>
+
+<span class="c1"># Close the rendering process</span>
+<span class="n">viewer</span><span class="o">.</span><span class="n">shutdown</span><span class="p">()</span>
+</pre></div>
+</div>
+</div><div aria-labelledby="tab-0-0-1" class="sphinx-tabs-panel" hidden="true" id="panel-0-0-1" name="0-1" role="tabpanel" tabindex="0"><div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">SimRender.core</span> <span class="kn">import</span> <span class="n">Player</span>
+
+<span class="c1"># Create the player</span>
+<span class="n">player</span> <span class="o">=</span> <span class="n">Player</span><span class="p">(</span><span class="n">sync</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+
+<span class="c1"># Create 3D object --&gt; see the dedicated section bellow</span>
+<span class="o">...</span>
+
+<span class="c1"># Launch the rendering process</span>
+<span class="n">player</span><span class="o">.</span><span class="n">launch</span><span class="p">()</span>
+
+<span class="c1"># Process any Python script</span>
+<span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">N</span><span class="p">):</span>
+
+    <span class="c1"># Step of simulation, update 3D object --&gt; see the dedicated section bellow</span>
+    <span class="o">...</span>
+
+    <span class="c1"># Render the current state of the simulation</span>
+    <span class="n">player</span><span class="o">.</span><span class="n">render</span><span class="p">()</span>
+
+<span class="c1"># Close the rendering process</span>
+<span class="n">player</span><span class="o">.</span><span class="n">shutdown</span><span class="p">()</span>
+</pre></div>
+</div>
+</div></div>
+</section>
+<section id="batch">
+<h3>Batch<a class="headerlink" href="#batch" title="Link to this heading"></a></h3>
+<p>The <a class="reference internal" href="api.html#SimRender.core.local.viewer_batch.ViewerBatch" title="SimRender.core.local.viewer_batch.ViewerBatch"><code class="xref py py-class docutils literal notranslate"><span class="pre">ViewerBatch</span></code></a> is used when several numerical simulation
+are running simultaneously and a viewer is needed for each.
+Instead of launching a rendering process per simulation - resulting in multiple display windows - the viewers can be
+launched as a batch to gather all the rendering sources in the same display window.
+A tab menu is created to easily switch between the simulation renderings.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">SimRender.core</span> <span class="kn">import</span> <span class="n">Viewer</span><span class="p">,</span> <span class="n">ViewerBatch</span>
+
+<span class="c1"># Initialize the batch with the number of sources to get the batch keys</span>
+<span class="n">batch</span> <span class="o">=</span> <span class="n">ViewerBatch</span><span class="p">()</span>
+<span class="n">batch_keys</span> <span class="o">=</span> <span class="n">batch</span><span class="o">.</span><span class="n">start</span><span class="p">(</span><span class="n">nb_view</span><span class="o">=</span><span class="mi">5</span><span class="p">)</span>
+
+<span class="c1"># Create several simulations with several viewers normally</span>
+<span class="n">viewers</span> <span class="o">=</span> <span class="p">[</span><span class="n">Viewers</span><span class="p">(</span><span class="n">sync</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span> <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">5</span><span class="p">)]</span>
+
+<span class="c1"># Create 3D object for each viewer normally</span>
+<span class="o">...</span>
+
+<span class="c1"># Launch the viewers with the given batch keys</span>
+<span class="k">for</span> <span class="n">viewer</span><span class="p">,</span> <span class="n">key</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">viewers</span><span class="p">,</span> <span class="n">batch_keys</span><span class="p">):</span>
+    <span class="n">viewer</span><span class="o">.</span><span class="n">launch</span><span class="p">(</span><span class="n">batch_key</span><span class="o">=</span><span class="n">key</span><span class="p">)</span>
+
+<span class="c1"># Process any Python script</span>
+<span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">N</span><span class="p">):</span>
+
+    <span class="c1"># Step of simulations, update 3D object normally</span>
+    <span class="o">...</span>
+
+    <span class="c1"># Render the current state of the simulations</span>
+    <span class="k">for</span> <span class="n">viewer</span> <span class="ow">in</span> <span class="n">viewers</span><span class="p">:</span>
+        <span class="n">viewer</span><span class="o">.</span><span class="n">render</span><span class="p">()</span>
+
+<span class="c1"># Close the viewers and stop the batch</span>
+<span class="k">for</span> <span class="n">viewer</span> <span class="ow">in</span> <span class="n">viewers</span><span class="p">:</span>
+    <span class="n">viewer</span><span class="o">.</span><span class="n">shutdown</span><span class="p">()</span>
+<span class="n">batch</span><span class="o">.</span><span class="n">stop</span><span class="p">()</span>
+</pre></div>
+</div>
+</section>
+</section>
+<section id="create-and-update-3d-objects">
+<h2>Create and update 3D objects<a class="headerlink" href="#create-and-update-3d-objects" title="Link to this heading"></a></h2>
+<p>The API to create and update 3D objects is exposed in the <a class="reference internal" href="api.html#SimRender.core.local.factory.Objects" title="SimRender.core.local.factory.Objects"><code class="xref py py-class docutils literal notranslate"><span class="pre">Viewer.objects</span></code></a>
+variable.
+Each object has an <cite>index</cite> identifier (following the creation order) required by the update methods.</p>
+<section id="create-objects">
+<h3>Create objects<a class="headerlink" href="#create-objects" title="Link to this heading"></a></h3>
+<p>Several object types can be created using <a class="reference internal" href="api.html#SimRender.core.local.factory.Objects.add_mesh" title="SimRender.core.local.factory.Objects.add_mesh"><code class="xref py py-meth docutils literal notranslate"><span class="pre">add_mesh</span></code></a>,
+<a class="reference internal" href="api.html#SimRender.core.local.factory.Objects.add_points" title="SimRender.core.local.factory.Objects.add_points"><code class="xref py py-meth docutils literal notranslate"><span class="pre">add_points</span></code></a>,
+<a class="reference internal" href="api.html#SimRender.core.local.factory.Objects.add_arrows" title="SimRender.core.local.factory.Objects.add_arrows"><code class="xref py py-meth docutils literal notranslate"><span class="pre">add_arrows</span></code></a> or
+<a class="reference internal" href="api.html#SimRender.core.local.factory.Objects.add_text" title="SimRender.core.local.factory.Objects.add_text"><code class="xref py py-meth docutils literal notranslate"><span class="pre">add_text</span></code></a>.
+Bellow are only the required variables, click on the respective button to get the detailed list of available options
+for an object.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">SimRender.core</span> <span class="kn">import</span> <span class="n">Viewer</span>
+
+<span class="c1"># Create the viewer</span>
+<span class="n">viewer</span> <span class="o">=</span> <span class="n">Viewer</span><span class="p">()</span>
+
+<span class="c1"># Add a mesh to the viewer</span>
+<span class="n">idx_mesh</span> <span class="o">=</span> <span class="n">viewer</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">add_mesh</span><span class="p">(</span><span class="n">positions</span><span class="o">=...</span><span class="p">,</span>
+                                   <span class="n">cells</span><span class="o">=...</span><span class="p">,</span>
+                                   <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+
+<span class="c1"># Add a point cloud to the viewer</span>
+<span class="n">idx_points</span> <span class="o">=</span> <span class="n">viewer</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">add_points</span><span class="p">(</span><span class="n">positions</span><span class="o">=...</span><span class="p">,</span>
+                                       <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+
+<span class="c1"># Add a vector field to the viewer</span>
+<span class="n">idx_arrows</span> <span class="o">=</span> <span class="n">viewer</span><span class="o">.</span><span class="n">object</span><span class="o">.</span><span class="n">add_arrows</span><span class="p">(</span><span class="n">positions</span><span class="o">=...</span><span class="p">,</span>
+                                      <span class="n">vectors</span><span class="o">=...</span><span class="p">,</span>
+                                      <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+
+<span class="c1"># Add a text to the viewer</span>
+<span class="n">idx_text</span> <span class="o">=</span> <span class="n">viewer</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">add_text</span><span class="p">(</span><span class="n">content</span><span class="o">=...</span><span class="p">)</span>
+</pre></div>
+</div>
+</section>
+<section id="update-objects">
+<h3>Update objects<a class="headerlink" href="#update-objects" title="Link to this heading"></a></h3>
+<p>To update the created objects, the respective methods
+(<a class="reference internal" href="api.html#SimRender.core.local.factory.Objects.update_mesh" title="SimRender.core.local.factory.Objects.update_mesh"><code class="xref py py-meth docutils literal notranslate"><span class="pre">update_mesh</span></code></a>,
+<a class="reference internal" href="api.html#SimRender.core.local.factory.Objects.update_points" title="SimRender.core.local.factory.Objects.update_points"><code class="xref py py-meth docutils literal notranslate"><span class="pre">update_points</span></code></a>,
+<a class="reference internal" href="api.html#SimRender.core.local.factory.Objects.update_arrows" title="SimRender.core.local.factory.Objects.update_arrows"><code class="xref py py-meth docutils literal notranslate"><span class="pre">update_arrows</span></code></a> or
+<a class="reference internal" href="api.html#SimRender.core.local.factory.Objects.update_text" title="SimRender.core.local.factory.Objects.update_text"><code class="xref py py-meth docutils literal notranslate"><span class="pre">update_text</span></code></a>) require the object index that was given
+following the creation order.
+Bellow are only the required variables, click on the respective button to get the detailed list of available options
+for an object.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># Update a mesh in the viewer</span>
+<span class="n">viewer</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">update_mesh</span><span class="p">(</span><span class="n">object_id</span><span class="o">=</span><span class="n">idx_mesh</span><span class="p">,</span>
+                           <span class="n">positions</span><span class="o">=...</span><span class="p">,</span>
+                           <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+
+<span class="c1"># Update a point cloud in the viewer</span>
+<span class="n">viewer</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">update_points</span><span class="p">(</span><span class="n">object_id</span><span class="o">=</span><span class="n">idx_points</span><span class="p">,</span>
+                             <span class="n">positions</span><span class="o">=...</span><span class="p">,</span>
+                             <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+
+<span class="c1"># Update a vector in the viewer</span>
+<span class="n">viewer</span><span class="o">.</span><span class="n">object</span><span class="o">.</span><span class="n">update_arrows</span><span class="p">(</span><span class="n">object_id</span><span class="o">=</span><span class="n">idx_arrows</span><span class="p">,</span>
+                            <span class="n">positions</span><span class="o">=...</span><span class="p">,</span>
+                            <span class="n">vectors</span><span class="o">=...</span><span class="p">,</span>
+                            <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+
+<span class="c1"># Add a text to the viewer</span>
+<span class="n">viewer</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">update_text</span><span class="p">(</span><span class="n">object_id</span><span class="o">=</span><span class="n">idx_text</span><span class="p">,</span>
+                           <span class="n">content</span><span class="o">=...</span><span class="p">)</span>
+</pre></div>
+</div>
+</section>
+</section>
+<section id="using-sofa-simulations">
+<h2>Using SOFA simulations<a class="headerlink" href="#using-sofa-simulations" title="Link to this heading"></a></h2>
+<p>Creating and updating 3D objects can be automated for SOFA numerical simulation:</p>
+<ul class="simple">
+<li><p>either with automated updates of manually defined 3D objects;</p></li>
+<li><p>either with automated creation and updates of 3D objects for some components detected in the scene graph.</p></li>
+</ul>
+<section id="automated-updates">
+<h3>Automated updates<a class="headerlink" href="#automated-updates" title="Link to this heading"></a></h3>
+<p>A dedicated <a class="reference internal" href="api.html#SimRender.sofa.local.viewer.Viewer" title="SimRender.sofa.local.viewer.Viewer"><code class="xref py py-class docutils literal notranslate"><span class="pre">Viewer</span></code></a> must be used to access the API to create 3D objects
+for SOFA.
+The methods to create and update objects is still available using the
+<a class="reference internal" href="api.html#SimRender.sofa.local.factory.Objects" title="SimRender.sofa.local.factory.Objects"><code class="xref py py-class docutils literal notranslate"><span class="pre">viewer.objects</span></code></a>, with new methods called
+<span class="guilabel">viewer.objects.add_sofa_&lt;object&gt;()</span>.
+These <em>create</em> methods do no longer require a static value for each data fields, but a SOFA Data that the <em>Factory</em> will
+access at each call to the <span class="guilabel">viewer.render()</span> method to automatically update the 3D object.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># This is also working with the BatchViewer and the Player</span>
+<span class="kn">from</span> <span class="nn">SimRender.sofa</span> <span class="kn">import</span> <span class="n">Viewer</span>
+<span class="kn">import</span> <span class="nn">Sofa</span>
+
+
+<span class="k">def</span> <span class="nf">create_scene</span><span class="p">(</span><span class="n">root</span><span class="p">:</span> <span class="n">Sofa</span><span class="o">.</span><span class="n">Core</span><span class="o">.</span><span class="n">Node</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Define a SOFA scene graph</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">root</span><span class="o">.</span><span class="n">addObject</span><span class="p">(</span><span class="s1">&#39;RequiredPlugin&#39;</span><span class="p">,</span> <span class="o">...</span><span class="p">)</span>
+
+    <span class="n">root</span><span class="o">.</span><span class="n">addObject</span><span class="p">(</span><span class="s1">&#39;DefaultAnimationLoop&#39;</span><span class="p">)</span>
+    <span class="n">root</span><span class="o">.</span><span class="n">addObject</span><span class="p">(</span><span class="s1">&#39;CollisionPipeline&#39;</span><span class="p">,</span> <span class="o">...</span><span class="p">)</span>
+    <span class="n">root</span><span class="o">.</span><span class="n">addObject</span><span class="p">(</span><span class="s1">&#39;BruteForceBroadPhase&#39;</span><span class="p">,</span> <span class="o">...</span><span class="p">)</span>
+    <span class="n">root</span><span class="o">.</span><span class="n">addObject</span><span class="p">(</span><span class="s1">&#39;BVHNarrowPhase&#39;</span><span class="p">,</span> <span class="o">...</span><span class="p">)</span>
+    <span class="n">root</span><span class="o">.</span><span class="n">addObject</span><span class="p">(</span><span class="s1">&#39;DefaultContactManager&#39;</span><span class="p">,</span> <span class="o">...</span><span class="p">)</span>
+
+    <span class="n">root</span><span class="o">.</span><span class="n">addObject</span><span class="p">(</span><span class="s1">&#39;MeshOBJLoader&#39;</span><span class="p">,</span> <span class="o">...</span><span class="p">)</span>
+
+    <span class="n">mecha</span> <span class="o">=</span> <span class="n">root</span><span class="o">.</span><span class="n">addChild</span><span class="p">(</span><span class="s1">&#39;mecha&#39;</span><span class="p">)</span>
+    <span class="n">mecha</span><span class="o">.</span><span class="n">addObject</span><span class="p">(</span><span class="s1">&#39;EulerImplicitSolver&#39;</span><span class="p">,</span> <span class="o">...</span><span class="p">)</span>
+    <span class="n">mecha</span><span class="o">.</span><span class="n">addObject</span><span class="p">(</span><span class="s1">&#39;CGLinearSolver&#39;</span><span class="p">,</span> <span class="o">...</span><span class="p">)</span>
+    <span class="n">mecha</span><span class="o">.</span><span class="n">addObject</span><span class="p">(</span><span class="s1">&#39;TetrahedronSetTopologyContainer&#39;</span><span class="p">,</span> <span class="o">...</span><span class="p">)</span>
+    <span class="n">mecha</span><span class="o">.</span><span class="n">addObject</span><span class="p">(</span><span class="s1">&#39;TetrahedronSetGeometryAlgorithms&#39;</span><span class="p">,</span> <span class="o">...</span><span class="p">)</span>
+    <span class="n">mecha</span><span class="o">.</span><span class="n">addObject</span><span class="p">(</span><span class="s1">&#39;MechanicalObject&#39;</span><span class="p">,</span> <span class="o">...</span><span class="p">)</span>
+    <span class="n">mecha</span><span class="o">.</span><span class="n">addObject</span><span class="p">(</span><span class="s1">&#39;DiagonalMass&#39;</span><span class="p">,</span> <span class="o">...</span><span class="p">)</span>
+    <span class="n">mecha</span><span class="o">.</span><span class="n">addObject</span><span class="p">(</span><span class="s1">&#39;TetrahedronFEMForceField&#39;</span><span class="p">,</span> <span class="o">...</span><span class="p">)</span>
+    <span class="n">mecha</span><span class="o">.</span><span class="n">addObject</span><span class="p">(</span><span class="s1">&#39;FixedConstraint&#39;</span><span class="p">,</span> <span class="o">...</span><span class="p">)</span>
+
+    <span class="n">visu</span> <span class="o">=</span> <span class="n">mecha</span><span class="o">.</span><span class="n">addChild</span><span class="p">(</span><span class="s1">&#39;visu&#39;</span><span class="p">)</span>
+    <span class="n">visu</span><span class="o">.</span><span class="n">addObject</span><span class="p">(</span><span class="s1">&#39;OglModel&#39;</span><span class="p">,</span> <span class="o">...</span><span class="p">)</span>
+    <span class="n">visu</span><span class="o">.</span><span class="n">addObject</span><span class="p">(</span><span class="s1">&#39;BarycentricMapping&#39;</span><span class="p">,</span> <span class="o">...</span><span class="p">)</span>
+
+
+<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s1">&#39;__main__&#39;</span><span class="p">:</span>
+
+    <span class="c1"># SOFA: create and init the scene graph</span>
+    <span class="n">root</span> <span class="o">=</span> <span class="n">Sofa</span><span class="o">.</span><span class="n">Core</span><span class="o">.</span><span class="n">Node</span><span class="p">(</span><span class="s1">&#39;root&#39;</span><span class="p">)</span>
+    <span class="n">create_scene</span><span class="p">(</span><span class="n">root</span><span class="p">)</span>
+    <span class="n">Sofa</span><span class="o">.</span><span class="n">Simulation</span><span class="o">.</span><span class="n">init</span><span class="p">(</span><span class="n">root</span><span class="p">)</span>
+
+    <span class="c1"># SimRender: create the viewer, create objects and start the rendering</span>
+    <span class="n">viewer</span> <span class="o">=</span> <span class="n">Viewer</span><span class="p">(</span><span class="n">root_node</span><span class="o">=</span><span class="n">root</span><span class="p">)</span>
+    <span class="n">viewer</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">add_sofa_mesh</span><span class="p">(</span><span class="n">positions_data</span><span class="o">=</span><span class="n">root</span><span class="o">.</span><span class="n">mecha</span><span class="o">.</span><span class="n">visu</span><span class="o">.</span><span class="n">ogl</span><span class="o">.</span><span class="n">position</span><span class="p">,</span>
+                                 <span class="n">cells_data</span><span class="o">=</span><span class="n">root</span><span class="o">.</span><span class="n">mecha</span><span class="o">.</span><span class="n">visu</span><span class="o">.</span><span class="n">ogl</span><span class="o">.</span><span class="n">triangles</span><span class="p">,</span>
+                                 <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+    <span class="n">viewer</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">add_sofa_points</span><span class="p">(</span><span class="n">positions_data</span><span class="o">=</span><span class="n">root</span><span class="o">.</span><span class="n">mecha</span><span class="o">.</span><span class="n">mo</span><span class="o">.</span><span class="n">position</span><span class="p">,</span>
+                                   <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+    <span class="n">viewer</span><span class="o">.</span><span class="n">launch</span><span class="p">()</span>
+
+    <span class="c1"># SOFA: run the time steps</span>
+    <span class="k">while</span> <span class="n">viewer</span><span class="o">.</span><span class="n">is_open</span><span class="p">:</span>
+        <span class="n">Sofa</span><span class="o">.</span><span class="n">Simulation</span><span class="o">.</span><span class="n">animate</span><span class="p">(</span><span class="n">root</span><span class="p">,</span> <span class="n">root</span><span class="o">.</span><span class="n">dt</span><span class="o">.</span><span class="n">value</span><span class="p">)</span>
+        <span class="c1"># SimRender: update the rendering view, 3D objects are automatically updated</span>
+        <span class="n">viewer</span><span class="o">.</span><span class="n">render</span><span class="p">()</span>
+
+    <span class="c1"># SimRender: close the rendering</span>
+    <span class="n">viewer</span><span class="o">.</span><span class="n">shutdown</span><span class="p">()</span>
+</pre></div>
+</div>
+</section>
+<section id="automated-scene-graph-detection">
+<h3>Automated scene graph detection<a class="headerlink" href="#automated-scene-graph-detection" title="Link to this heading"></a></h3>
+<p>The <a class="reference internal" href="api.html#SimRender.sofa.local.factory.Objects" title="SimRender.sofa.local.factory.Objects"><code class="xref py py-class docutils literal notranslate"><span class="pre">viewer.objects</span></code></a> also has an additional method to automatically
+create and update some SOFA components: <a class="reference internal" href="api.html#SimRender.sofa.local.factory.Objects.add_scene_graph" title="SimRender.sofa.local.factory.Objects.add_scene_graph"><code class="xref py py-meth docutils literal notranslate"><span class="pre">add_scene_graph</span></code></a>.
+The scene graph is explored to detect component types in a pre-defined list (soon extended):</p>
+<blockquote>
+<div><table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p><strong>Models</strong></p></th>
+<th class="head"><p><strong>Components</strong></p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><span class="guilabel">Visual</span></p></td>
+<td><p>OglModel</p></td>
+</tr>
+<tr class="row-odd"><td><p><span class="guilabel">Behavior</span></p></td>
+<td><p>FixedConstraint, MechanicalObject</p></td>
+</tr>
+<tr class="row-even"><td><p><span class="guilabel">ForceField</span></p></td>
+<td><p>ConstantForceField</p></td>
+</tr>
+<tr class="row-odd"><td><p><span class="guilabel">Collision</span></p></td>
+<td><p>PointCollisionModel, LineCollisionModel, TriangleCollisionModel</p></td>
+</tr>
+</tbody>
+</table>
+</div></blockquote>
+<p>Then, 3D objects are automatically created like in the section above to be automatically updated then.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># This is also working with the BatchViewer and the Player</span>
+<span class="kn">from</span> <span class="nn">SimRender.sofa</span> <span class="kn">import</span> <span class="n">Viewer</span>
+<span class="kn">import</span> <span class="nn">Sofa</span>
+
+
+<span class="k">def</span> <span class="nf">create_scene</span><span class="p">(</span><span class="n">root</span><span class="p">:</span> <span class="n">Sofa</span><span class="o">.</span><span class="n">Core</span><span class="o">.</span><span class="n">Node</span><span class="p">):</span>
+    <span class="o">...</span>
+
+
+<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s1">&#39;__main__&#39;</span><span class="p">:</span>
+
+    <span class="c1"># SOFA: create and init the scene graph</span>
+    <span class="n">root</span> <span class="o">=</span> <span class="n">Sofa</span><span class="o">.</span><span class="n">Core</span><span class="o">.</span><span class="n">Node</span><span class="p">(</span><span class="s1">&#39;root&#39;</span><span class="p">)</span>
+    <span class="n">create_scene</span><span class="p">(</span><span class="n">root</span><span class="p">)</span>
+    <span class="n">Sofa</span><span class="o">.</span><span class="n">Simulation</span><span class="o">.</span><span class="n">init</span><span class="p">(</span><span class="n">root</span><span class="p">)</span>
+
+    <span class="c1"># SimRender: create the viewer, explore scene graph and start the rendering</span>
+    <span class="n">viewer</span> <span class="o">=</span> <span class="n">Viewer</span><span class="p">(</span><span class="n">root_node</span><span class="o">=</span><span class="n">root</span><span class="p">)</span>
+    <span class="n">viewer</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">add_scene_graph</span><span class="p">(</span><span class="n">visual_models</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                                   <span class="n">behavior_models</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                                   <span class="n">force_fields</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                                   <span class="n">collision_models</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="n">viewer</span><span class="o">.</span><span class="n">launch</span><span class="p">()</span>
+
+    <span class="c1"># SOFA: run the time steps</span>
+    <span class="k">while</span> <span class="n">viewer</span><span class="o">.</span><span class="n">is_open</span><span class="p">:</span>
+        <span class="n">Sofa</span><span class="o">.</span><span class="n">Simulation</span><span class="o">.</span><span class="n">animate</span><span class="p">(</span><span class="n">root</span><span class="p">,</span> <span class="n">root</span><span class="o">.</span><span class="n">dt</span><span class="o">.</span><span class="n">value</span><span class="p">)</span>
+        <span class="c1"># SimRender: update the rendering view</span>
+        <span class="n">viewer</span><span class="o">.</span><span class="n">render</span><span class="p">()</span>
+
+    <span class="c1"># SimRender: close the rendering</span>
+    <span class="n">viewer</span><span class="o">.</span><span class="n">shutdown</span><span class="p">()</span>
+</pre></div>
+</div>
+</section>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="about.html" class="btn btn-neutral float-left" title="Project Details" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="api.html" class="btn btn-neutral float-right" title="API" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2024, Mimesis, Inria.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

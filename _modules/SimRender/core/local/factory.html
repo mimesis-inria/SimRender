@@ -1,0 +1,564 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>SimRender.core.local.factory &mdash; SimRender  documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="../../../../_static/css/theme.css?v=e59714d7" />
+      <link rel="stylesheet" type="text/css" href="../../../../_static/copybutton.css?v=76b2166b" />
+      <link rel="stylesheet" type="text/css" href="../../../../_static/theme.css?v=556d74e5" />
+
+  
+      <script src="../../../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../../../_static/documentation_options.js?v=5929fcd5"></script>
+      <script src="../../../../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script src="../../../../_static/clipboard.min.js?v=a7894cd8"></script>
+      <script src="../../../../_static/copybutton.js?v=f281be69"></script>
+    <script src="../../../../_static/js/theme.js"></script>
+    <link rel="author" title="About these documents" href="../../../../about.html" />
+    <link rel="index" title="Index" href="../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../../index.html" class="icon icon-home">
+            SimRender
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../install.html">Install</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../about.html">About</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../usage.html">Getting started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../api.html">API</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../../index.html">SimRender</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">SimRender.core.local.factory</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for SimRender.core.local.factory</h1><div class="highlight"><pre>
+<span></span><span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">Any</span>
+<span class="kn">from</span> <span class="nn">socket</span> <span class="kn">import</span> <span class="n">socket</span><span class="p">,</span> <span class="n">AF_INET</span><span class="p">,</span> <span class="n">SOCK_STREAM</span><span class="p">,</span> <span class="n">SOL_SOCKET</span><span class="p">,</span> <span class="n">SO_REUSEADDR</span>
+<span class="kn">from</span> <span class="nn">multiprocessing.shared_memory</span> <span class="kn">import</span> <span class="n">SharedMemory</span>
+<span class="kn">from</span> <span class="nn">time</span> <span class="kn">import</span> <span class="n">sleep</span>
+<span class="kn">from</span> <span class="nn">numpy</span> <span class="kn">import</span> <span class="n">array</span><span class="p">,</span> <span class="n">ndarray</span><span class="p">,</span> <span class="n">nan</span>
+
+<span class="kn">from</span> <span class="nn">SimRender.core.local.memory</span> <span class="kn">import</span> <span class="n">Memory</span>
+<span class="kn">from</span> <span class="nn">SimRender.core.utils</span> <span class="kn">import</span> <span class="n">flat_mesh_cells</span>
+
+
+<span class="k">class</span> <span class="nc">Factory</span><span class="p">:</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sync</span><span class="p">:</span> <span class="nb">bool</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        This class is used to manage the communication with the visualization process.</span>
+<span class="sd">        It creates and update the visualization data in shared memories.</span>
+
+<span class="sd">        :param sync: If True, the update call is synchronized with the end of the remote rendering step.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="c1"># Create the shared memories container</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">memories</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Memory</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
+
+        <span class="c1"># Create the visual object API</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">objects</span> <span class="o">=</span> <span class="n">Objects</span><span class="p">(</span><span class="n">factory</span><span class="o">=</span><span class="bp">self</span><span class="p">)</span>
+
+        <span class="c1"># Local and remote socket to communicate between processes</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__socket</span> <span class="o">=</span> <span class="n">socket</span><span class="p">(</span><span class="n">AF_INET</span><span class="p">,</span> <span class="n">SOCK_STREAM</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__socket</span><span class="o">.</span><span class="n">setsockopt</span><span class="p">(</span><span class="n">SOL_SOCKET</span><span class="p">,</span> <span class="n">SO_REUSEADDR</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__remote</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">socket</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+
+        <span class="c1"># Define the synchronization function if required, otherwise add a manual delay (minimal synchronization)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__sync_fct</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__sync</span> <span class="k">if</span> <span class="n">sync</span> <span class="k">else</span> <span class="k">lambda</span><span class="p">:</span> <span class="n">sleep</span><span class="p">(</span><span class="mf">1e-6</span><span class="p">)</span>
+        <span class="c1"># Create a shared numpy array for synchronization with format [do_exit, do_synchronize, step_counter]</span>
+        <span class="n">sync_array</span> <span class="o">=</span> <span class="n">array</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">int</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__sync_sm</span> <span class="o">=</span> <span class="n">SharedMemory</span><span class="p">(</span><span class="n">create</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="n">sync_array</span><span class="o">.</span><span class="n">nbytes</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__sync_arr</span> <span class="o">=</span> <span class="n">ndarray</span><span class="p">(</span><span class="n">shape</span><span class="o">=</span><span class="n">sync_array</span><span class="o">.</span><span class="n">shape</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">sync_array</span><span class="o">.</span><span class="n">dtype</span><span class="p">,</span> <span class="n">buffer</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">__sync_sm</span><span class="o">.</span><span class="n">buf</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__sync_arr</span><span class="p">[</span><span class="o">...</span><span class="p">]</span> <span class="o">=</span> <span class="n">sync_array</span><span class="p">[</span><span class="o">...</span><span class="p">]</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">is_open</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__sync_arr</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="mi">0</span>
+
+    <span class="k">def</span> <span class="nf">init</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">batch_key</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Initialize the local socket.</span>
+
+<span class="sd">        :return: Available port number of the socket.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="c1"># Case 1: Non-batch mode, get an available socket port</span>
+        <span class="k">if</span> <span class="n">batch_key</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">__socket</span><span class="o">.</span><span class="n">bind</span><span class="p">((</span><span class="s1">&#39;localhost&#39;</span><span class="p">,</span> <span class="mi">0</span><span class="p">))</span>
+        <span class="c1"># Case 2: Batch mode, bind to the defined key</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="c1"># Disable sync for batch mode</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">__sync_fct</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">__sync</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">__sync_fct</span> <span class="o">=</span> <span class="k">lambda</span><span class="p">:</span> <span class="kc">None</span>
+                <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Warning: Synchronization is not available for Viewer in batch mode &#39;</span>
+                      <span class="s1">&#39;(automatically turned &quot;sync&quot; parameter to False)&#39;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">__socket</span><span class="o">.</span><span class="n">bind</span><span class="p">((</span><span class="s1">&#39;localhost&#39;</span><span class="p">,</span> <span class="n">batch_key</span><span class="p">))</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__socket</span><span class="o">.</span><span class="n">getsockname</span><span class="p">()[</span><span class="mi">1</span><span class="p">]</span>
+
+    <span class="k">def</span> <span class="nf">connect</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Connect to the remote process and communicate each shared memory information.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="c1"># Connect to the remote socket</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__socket</span><span class="o">.</span><span class="n">listen</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__remote</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__socket</span><span class="o">.</span><span class="n">accept</span><span class="p">()</span>
+
+        <span class="c1"># Send information about the sync shared array</span>
+        <span class="n">sm_name</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__sync_sm</span><span class="o">.</span><span class="n">name</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="n">encoding</span><span class="o">=</span><span class="s1">&#39;utf-8&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__remote</span><span class="o">.</span><span class="n">send</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">sm_name</span><span class="p">)</span><span class="o">.</span><span class="n">to_bytes</span><span class="p">(</span><span class="n">length</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">byteorder</span><span class="o">=</span><span class="s1">&#39;big&#39;</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__remote</span><span class="o">.</span><span class="n">send</span><span class="p">(</span><span class="n">sm_name</span><span class="p">)</span>
+
+        <span class="c1"># Send the number of visual objects, then information about each visual object shared arrays</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__remote</span><span class="o">.</span><span class="n">send</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">memories</span><span class="p">)</span><span class="o">.</span><span class="n">to_bytes</span><span class="p">(</span><span class="n">length</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">byteorder</span><span class="o">=</span><span class="s1">&#39;big&#39;</span><span class="p">))</span>
+        <span class="k">for</span> <span class="n">memory</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">memories</span><span class="p">:</span>
+            <span class="n">memory</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="n">remote</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">__remote</span><span class="p">)</span>
+
+        <span class="c1"># Wait for the remote viewer to create all visual objects</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__remote</span><span class="o">.</span><span class="n">recv</span><span class="p">(</span><span class="mi">4</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">update</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Trigger a render call in the remote process.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="c1"># Increment the shared step counter to trigger the remote render</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__sync_arr</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="o">+=</span> <span class="mi">1</span>
+
+        <span class="c1"># If defined, call the synchronization function</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__sync_fct</span><span class="p">()</span>
+
+    <span class="k">def</span> <span class="nf">__sync</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Synchronization with the remote process.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="c1"># Turn the &#39;do_synchronize&#39; shared flag on</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__sync_arr</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span>
+
+        <span class="c1"># Wait for the remote process to be done (after several tests, it appears to be the faster way)</span>
+        <span class="n">a</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__remote</span><span class="o">.</span><span class="n">recv</span><span class="p">(</span><span class="mi">4</span><span class="p">)</span>
+
+        <span class="c1"># Turn the &#39;do_synchronize&#39; shared flag off</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__sync_arr</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span>
+
+    <span class="k">def</span> <span class="nf">close</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Close the communication with the visualization process.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="c1"># Turn the &#39;do_exit&#39; shared flag on</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__sync_arr</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span>
+
+        <span class="c1"># Wait for the visualization process to close connections with the shared memories</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__remote</span><span class="o">.</span><span class="n">recv</span><span class="p">(</span><span class="mi">4</span><span class="p">)</span>
+
+        <span class="c1"># Close the connection with the shared memories (synchronization array and each visual object array)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__sync_sm</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__sync_sm</span><span class="o">.</span><span class="n">unlink</span><span class="p">()</span>
+        <span class="k">for</span> <span class="n">memory</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">memories</span><span class="p">:</span>
+            <span class="n">memory</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+
+        <span class="c1"># Close local and remote sockets</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__remote</span><span class="o">.</span><span class="n">send</span><span class="p">(</span><span class="sa">b</span><span class="s1">&#39;done&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__socket</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+
+
+<div class="viewcode-block" id="Objects">
+<a class="viewcode-back" href="../../../../api.html#SimRender.core.local.factory.Objects">[docs]</a>
+<span class="k">class</span> <span class="nc">Objects</span><span class="p">:</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">factory</span><span class="p">:</span> <span class="n">Factory</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        This class gathers the methods to create and update visual objects.</span>
+
+<span class="sd">        :param factory: Factory that handles the objects.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="c1"># Keep the Factory as a private attribute so that it is not accessible for users</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__factory</span> <span class="o">=</span> <span class="n">factory</span>
+
+        <span class="c1"># Store objects types to check the update methods calls</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__types</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
+
+    <span class="k">def</span> <span class="nf">__add_object</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">object_type</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">data</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Joint method to create a visual object.</span>
+
+<span class="sd">        :param object_type: Object type (mesh, points...).</span>
+<span class="sd">        :param data: Object data (positions, color...).</span>
+<span class="sd">        :return: ID of the visual object in the viewer.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="c1"># The call to locals() in the add_ methods also includes the &#39;self&#39; key</span>
+        <span class="k">del</span> <span class="n">data</span><span class="p">[</span><span class="s1">&#39;self&#39;</span><span class="p">]</span>
+
+        <span class="c1"># Create a new memory for the visual object</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__factory</span><span class="o">.</span><span class="n">memories</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">Memory</span><span class="p">(</span><span class="n">object_type</span><span class="o">=</span><span class="n">object_type</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="n">data</span><span class="p">))</span>
+
+        <span class="c1"># Store the type of the visual object</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__types</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">object_type</span><span class="p">)</span>
+
+        <span class="c1"># Return the visual object ID</span>
+        <span class="k">return</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__types</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span>
+
+    <span class="k">def</span> <span class="nf">__update_object</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">object_type</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">data</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Joint method to update a visual object.</span>
+
+<span class="sd">        :param object_type: Object type (mesh, points...).</span>
+<span class="sd">        :param data: Object data (positions, color...).</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="c1"># The call to locals() in the update_ methods also includes &#39;self&#39; and &#39;object_id&#39; keys</span>
+        <span class="k">del</span> <span class="n">data</span><span class="p">[</span><span class="s1">&#39;self&#39;</span><span class="p">]</span>
+        <span class="n">object_id</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s1">&#39;object_id&#39;</span><span class="p">)</span>
+
+        <span class="c1"># Check that the update_ method is called for the good visual object type</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__check_id</span><span class="p">(</span><span class="n">object_id</span><span class="o">=</span><span class="n">object_id</span><span class="p">,</span> <span class="n">object_type</span><span class="o">=</span><span class="n">object_type</span><span class="p">)</span>
+
+        <span class="c1"># Update the data fields in the shared memories</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__factory</span><span class="o">.</span><span class="n">memories</span><span class="p">[</span><span class="n">object_id</span><span class="p">]</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="n">data</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">__check_id</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">object_id</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">object_type</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Check that the visual object is called with the right method.</span>
+
+<span class="sd">        :param object_id: ID of the visual object.</span>
+<span class="sd">        :param object_type: Object type (mesh, points...).</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">if</span> <span class="n">object_type</span> <span class="o">!=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__types</span><span class="p">[</span><span class="n">object_id</span><span class="p">]:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;The object with ID=</span><span class="si">{</span><span class="n">object_id</span><span class="si">}</span><span class="s2"> is type &#39;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">__types</span><span class="p">[</span><span class="n">object_id</span><span class="p">]</span><span class="si">}</span><span class="s2">&#39;.&quot;</span>
+                             <span class="sa">f</span><span class="s2">&quot;Call update_</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">__types</span><span class="p">[</span><span class="n">object_id</span><span class="p">]</span><span class="si">}</span><span class="s2">() instead of update_</span><span class="si">{</span><span class="n">object_type</span><span class="si">}</span><span class="s2">().&quot;</span><span class="p">)</span>
+
+<div class="viewcode-block" id="Objects.add_mesh">
+<a class="viewcode-back" href="../../../../api.html#SimRender.core.local.factory.Objects.add_mesh">[docs]</a>
+    <span class="k">def</span> <span class="nf">add_mesh</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
+                 <span class="n">positions</span><span class="p">:</span> <span class="n">ndarray</span><span class="p">,</span>
+                 <span class="n">cells</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">int</span><span class="p">],</span>
+                 <span class="n">color</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;green&#39;</span><span class="p">,</span>
+                 <span class="n">alpha</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">1.</span><span class="p">,</span>
+                 <span class="n">wireframe</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+                 <span class="n">line_width</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">1.</span><span class="p">,</span>
+                 <span class="n">colormap</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;jet&#39;</span><span class="p">,</span>
+                 <span class="n">colormap_field</span><span class="p">:</span> <span class="n">ndarray</span> <span class="o">=</span> <span class="n">array</span><span class="p">(</span><span class="n">nan</span><span class="p">),</span>
+                 <span class="n">colormap_range</span><span class="p">:</span> <span class="n">ndarray</span> <span class="o">=</span> <span class="n">array</span><span class="p">(</span><span class="n">nan</span><span class="p">),</span>
+                 <span class="n">texture_name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span><span class="p">,</span>
+                 <span class="n">texture_coords</span><span class="p">:</span> <span class="n">ndarray</span> <span class="o">=</span> <span class="n">array</span><span class="p">(</span><span class="n">nan</span><span class="p">))</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Add a new mesh in the viewer.</span>
+
+<span class="sd">        :param positions: Positions of the mesh.</span>
+<span class="sd">        :param cells: Faces of the mesh.</span>
+<span class="sd">        :param color: Color of the mesh.</span>
+<span class="sd">        :param alpha: Opacity of the mesh.</span>
+<span class="sd">        :param wireframe: If True, the mesh has a wireframe representation.</span>
+<span class="sd">        :param line_width: Width of the mesh edges.</span>
+<span class="sd">        :param colormap: Color map scheme name.</span>
+<span class="sd">        :param colormap_field: Scalar values to color the mesh regarding the colormap.</span>
+<span class="sd">        :param colormap_range: Range of the color map.</span>
+<span class="sd">        :param texture_name: Name of the texture file.</span>
+<span class="sd">        :param texture_coords: Texture coordinates.</span>
+<span class="sd">        :return: ID of the object in the viewer.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">cells</span> <span class="o">=</span> <span class="n">array</span><span class="p">(</span><span class="n">cells</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">ValueError</span><span class="p">:</span>
+            <span class="n">cells</span> <span class="o">=</span> <span class="n">flat_mesh_cells</span><span class="p">(</span><span class="n">cells</span><span class="o">=</span><span class="n">cells</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__add_object</span><span class="p">(</span><span class="n">object_type</span><span class="o">=</span><span class="s1">&#39;mesh&#39;</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="nb">locals</span><span class="p">())</span></div>
+
+
+<div class="viewcode-block" id="Objects.update_mesh">
+<a class="viewcode-back" href="../../../../api.html#SimRender.core.local.factory.Objects.update_mesh">[docs]</a>
+    <span class="k">def</span> <span class="nf">update_mesh</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
+                    <span class="n">object_id</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+                    <span class="n">positions</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">ndarray</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+                    <span class="n">color</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+                    <span class="n">alpha</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+                    <span class="n">wireframe</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">bool</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+                    <span class="n">line_width</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+                    <span class="n">colormap_field</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">ndarray</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Update an existing mesh in the viewer.</span>
+
+<span class="sd">        :param object_id: ID of the object as returned when created.</span>
+<span class="sd">        :param positions: Positions of the mesh.</span>
+<span class="sd">        :param color: Color of the mesh.</span>
+<span class="sd">        :param alpha: Opacity of the mesh.</span>
+<span class="sd">        :param wireframe: If True, the mesh has a wireframe representation.</span>
+<span class="sd">        :param line_width: Width of the mesh edges.</span>
+<span class="sd">        :param colormap_field: Scalar values to color the mesh regarding the colormap.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">__update_object</span><span class="p">(</span><span class="n">object_type</span><span class="o">=</span><span class="s1">&#39;mesh&#39;</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="nb">locals</span><span class="p">())</span></div>
+
+
+<div class="viewcode-block" id="Objects.add_points">
+<a class="viewcode-back" href="../../../../api.html#SimRender.core.local.factory.Objects.add_points">[docs]</a>
+    <span class="k">def</span> <span class="nf">add_points</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
+                   <span class="n">positions</span><span class="p">:</span> <span class="n">ndarray</span><span class="p">,</span>
+                   <span class="n">color</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;green&#39;</span><span class="p">,</span>
+                   <span class="n">alpha</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">1.</span><span class="p">,</span>
+                   <span class="n">point_size</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">4</span><span class="p">,</span>
+                   <span class="n">colormap</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;jet&#39;</span><span class="p">,</span>
+                   <span class="n">colormap_field</span><span class="p">:</span> <span class="n">ndarray</span> <span class="o">=</span> <span class="n">array</span><span class="p">(</span><span class="n">nan</span><span class="p">),</span>
+                   <span class="n">colormap_range</span><span class="p">:</span> <span class="n">ndarray</span> <span class="o">=</span> <span class="n">array</span><span class="p">(</span><span class="n">nan</span><span class="p">))</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Add a new point cloud in the viewer.</span>
+
+<span class="sd">        :param positions: Positions of the point cloud.</span>
+<span class="sd">        :param color: Color of the point cloud.</span>
+<span class="sd">        :param alpha: Opacity of the point cloud.</span>
+<span class="sd">        :param point_size: Size of points.</span>
+<span class="sd">        :param colormap: Color map scheme name.</span>
+<span class="sd">        :param colormap_field: Scalar values to color the point cloud regarding the colormap.</span>
+<span class="sd">        :param colormap_range: Range of the color map.</span>
+<span class="sd">        :return: ID of the object in the viewer.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__add_object</span><span class="p">(</span><span class="n">object_type</span><span class="o">=</span><span class="s1">&#39;points&#39;</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="nb">locals</span><span class="p">())</span></div>
+
+
+<div class="viewcode-block" id="Objects.update_points">
+<a class="viewcode-back" href="../../../../api.html#SimRender.core.local.factory.Objects.update_points">[docs]</a>
+    <span class="k">def</span> <span class="nf">update_points</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
+                      <span class="n">object_id</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+                      <span class="n">positions</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">ndarray</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+                      <span class="n">color</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+                      <span class="n">alpha</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+                      <span class="n">point_size</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+                      <span class="n">colormap_field</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">ndarray</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Update an existing point cloud in the viewer.</span>
+
+<span class="sd">        :param object_id: ID of the object as returned when created.</span>
+<span class="sd">        :param positions: Positions of the point cloud.</span>
+<span class="sd">        :param color: Color of the point cloud.</span>
+<span class="sd">        :param alpha: Opacity of the point cloud.</span>
+<span class="sd">        :param point_size: Size of points.</span>
+<span class="sd">        :param colormap_field: Scalar values to color the point cloud regarding the colormap.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">__update_object</span><span class="p">(</span><span class="n">object_type</span><span class="o">=</span><span class="s1">&#39;points&#39;</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="nb">locals</span><span class="p">())</span></div>
+
+
+<div class="viewcode-block" id="Objects.add_arrows">
+<a class="viewcode-back" href="../../../../api.html#SimRender.core.local.factory.Objects.add_arrows">[docs]</a>
+    <span class="k">def</span> <span class="nf">add_arrows</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
+                   <span class="n">positions</span><span class="p">:</span> <span class="n">ndarray</span><span class="p">,</span>
+                   <span class="n">vectors</span><span class="p">:</span> <span class="n">ndarray</span><span class="p">,</span>
+                   <span class="n">color</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;green&#39;</span><span class="p">,</span>
+                   <span class="n">alpha</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">1.</span><span class="p">,</span>
+                   <span class="n">colormap</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;jet&#39;</span><span class="p">,</span>
+                   <span class="n">colormap_field</span><span class="p">:</span> <span class="n">ndarray</span> <span class="o">=</span> <span class="n">array</span><span class="p">(</span><span class="n">nan</span><span class="p">),</span>
+                   <span class="n">colormap_range</span><span class="p">:</span> <span class="n">ndarray</span> <span class="o">=</span> <span class="n">array</span><span class="p">(</span><span class="n">nan</span><span class="p">))</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Add a new point cloud in the viewer.</span>
+
+<span class="sd">        :param positions: Positions of the arrows bases.</span>
+<span class="sd">        :param vectors: Vectors of the arrows.</span>
+<span class="sd">        :param color: Color of the arrows.</span>
+<span class="sd">        :param alpha: Opacity of the arrows.</span>
+<span class="sd">        :param colormap: Color map scheme name.</span>
+<span class="sd">        :param colormap_field: Scalar values to color the point cloud regarding the colormap.</span>
+<span class="sd">        :param colormap_range: Range of the color map.</span>
+<span class="sd">        :return: ID of the object in the viewer.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__add_object</span><span class="p">(</span><span class="n">object_type</span><span class="o">=</span><span class="s1">&#39;arrows&#39;</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="nb">locals</span><span class="p">())</span></div>
+
+
+<div class="viewcode-block" id="Objects.update_arrows">
+<a class="viewcode-back" href="../../../../api.html#SimRender.core.local.factory.Objects.update_arrows">[docs]</a>
+    <span class="k">def</span> <span class="nf">update_arrows</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
+                      <span class="n">object_id</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+                      <span class="n">positions</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">ndarray</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+                      <span class="n">vectors</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">ndarray</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+                      <span class="n">color</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+                      <span class="n">alpha</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+                      <span class="n">colormap_field</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">ndarray</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Update an existing point cloud in the viewer.</span>
+
+<span class="sd">        :param object_id: ID of the object as returned when created.</span>
+<span class="sd">        :param positions: Positions of the point cloud.</span>
+<span class="sd">        :param vectors: Vectors of the arrows.</span>
+<span class="sd">        :param color: Color of the point cloud.</span>
+<span class="sd">        :param alpha: Opacity of the point cloud.</span>
+<span class="sd">        :param colormap_field: Scalar values to color the point cloud regarding the colormap.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">__update_object</span><span class="p">(</span><span class="n">object_type</span><span class="o">=</span><span class="s1">&#39;arrows&#39;</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="nb">locals</span><span class="p">())</span></div>
+
+
+<div class="viewcode-block" id="Objects.add_lines">
+<a class="viewcode-back" href="../../../../api.html#SimRender.core.local.factory.Objects.add_lines">[docs]</a>
+    <span class="k">def</span> <span class="nf">add_lines</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
+                  <span class="n">start_positions</span><span class="p">:</span> <span class="n">ndarray</span><span class="p">,</span>
+                  <span class="n">end_positions</span><span class="p">:</span> <span class="n">ndarray</span><span class="p">,</span>
+                  <span class="n">color</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;green&#39;</span><span class="p">,</span>
+                  <span class="n">alpha</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">1.</span><span class="p">,</span>
+                  <span class="n">line_width</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">1.</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Add line segments to the viewer.</span>
+
+<span class="sd">        :param start_positions: Start position of each line segment.</span>
+<span class="sd">        :param end_positions: End position of each line segment.</span>
+<span class="sd">        :param color: Color of the lines.</span>
+<span class="sd">        :param alpha: Opacity of the lines.</span>
+<span class="sd">        :param line_width: Width of the lines.</span>
+<span class="sd">        :return: ID of the object in the viewer.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__add_object</span><span class="p">(</span><span class="n">object_type</span><span class="o">=</span><span class="s1">&#39;lines&#39;</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="nb">locals</span><span class="p">())</span></div>
+
+
+<div class="viewcode-block" id="Objects.update_lines">
+<a class="viewcode-back" href="../../../../api.html#SimRender.core.local.factory.Objects.update_lines">[docs]</a>
+    <span class="k">def</span> <span class="nf">update_lines</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
+                     <span class="n">object_id</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+                     <span class="n">start_positions</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">ndarray</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+                     <span class="n">end_positions</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">ndarray</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+                     <span class="n">color</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+                     <span class="n">alpha</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+                     <span class="n">line_width</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Update existing line segments in the viewer.</span>
+
+<span class="sd">        :param object_id: ID of the object as returned when created.</span>
+<span class="sd">        :param start_positions: Start position of each line segment.</span>
+<span class="sd">        :param end_positions: End position of each line segment.</span>
+<span class="sd">        :param color: Color of the lines.</span>
+<span class="sd">        :param alpha: Opacity of the lines.</span>
+<span class="sd">        :param line_width: Width of the lines.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">__update_object</span><span class="p">(</span><span class="n">object_type</span><span class="o">=</span><span class="s1">&#39;lines&#39;</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="nb">locals</span><span class="p">())</span></div>
+
+
+<div class="viewcode-block" id="Objects.add_text">
+<a class="viewcode-back" href="../../../../api.html#SimRender.core.local.factory.Objects.add_text">[docs]</a>
+    <span class="k">def</span> <span class="nf">add_text</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
+                 <span class="n">content</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+                 <span class="n">corner</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;BR&#39;</span><span class="p">,</span>
+                 <span class="n">color</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;black&#39;</span><span class="p">,</span>
+                 <span class="n">font</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span><span class="p">,</span>
+                 <span class="n">size</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span>
+                 <span class="n">bold</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+                 <span class="n">italic</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Add 2D text in the viewer.</span>
+
+<span class="sd">        :param content: Text content (max 100 car.).</span>
+<span class="sd">        :param corner: Vertical (Top, Middle, Bottom) and horizontal (Left, Middle, Right) positions of the Text - for</span>
+<span class="sd">                       instance, &#39;BR&#39; stands for &#39;bottom-right&#39;.</span>
+<span class="sd">        :param color: Text color.</span>
+<span class="sd">        :param font: Text font name.</span>
+<span class="sd">        :param size: Text size.</span>
+<span class="sd">        :param bold: If True, apply bold style to the text.</span>
+<span class="sd">        :param italic: If True, apply italic style to the text.</span>
+<span class="sd">        :return: ID of the object in the viewer.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">content</span> <span class="o">=</span> <span class="n">array</span><span class="p">(</span><span class="n">content</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="s1">&#39;&lt;U100&#39;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__add_object</span><span class="p">(</span><span class="n">object_type</span><span class="o">=</span><span class="s1">&#39;text&#39;</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="nb">locals</span><span class="p">())</span></div>
+
+
+<div class="viewcode-block" id="Objects.update_text">
+<a class="viewcode-back" href="../../../../api.html#SimRender.core.local.factory.Objects.update_text">[docs]</a>
+    <span class="k">def</span> <span class="nf">update_text</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
+                    <span class="n">object_id</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+                    <span class="n">content</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+                    <span class="n">color</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;black&#39;</span><span class="p">,</span>
+                    <span class="n">bold</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+                    <span class="n">italic</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Update an existing text in the viewer.</span>
+
+<span class="sd">        :param object_id: ID of the object as returned when created.</span>
+<span class="sd">        :param content: Text content (max 100 car.).</span>
+<span class="sd">        :param color: Text color.</span>
+<span class="sd">        :param bold: If True, apply bold style to the text.</span>
+<span class="sd">        :param italic: If True, apply italic style to the text.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">content</span> <span class="o">=</span> <span class="n">array</span><span class="p">(</span><span class="n">content</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="s1">&#39;&lt;U100&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__update_object</span><span class="p">(</span><span class="n">object_type</span><span class="o">=</span><span class="s1">&#39;text&#39;</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="nb">locals</span><span class="p">())</span></div>
+</div>
+
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2024, Mimesis, Inria.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

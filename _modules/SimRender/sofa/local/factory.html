@@ -1,0 +1,390 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>SimRender.sofa.local.factory &mdash; SimRender  documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="../../../../_static/css/theme.css?v=e59714d7" />
+      <link rel="stylesheet" type="text/css" href="../../../../_static/copybutton.css?v=76b2166b" />
+      <link rel="stylesheet" type="text/css" href="../../../../_static/theme.css?v=556d74e5" />
+
+  
+      <script src="../../../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../../../_static/documentation_options.js?v=5929fcd5"></script>
+      <script src="../../../../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script src="../../../../_static/clipboard.min.js?v=a7894cd8"></script>
+      <script src="../../../../_static/copybutton.js?v=f281be69"></script>
+    <script src="../../../../_static/js/theme.js"></script>
+    <link rel="author" title="About these documents" href="../../../../about.html" />
+    <link rel="index" title="Index" href="../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../../index.html" class="icon icon-home">
+            SimRender
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../install.html">Install</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../about.html">About</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../usage.html">Getting started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../api.html">API</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../../index.html">SimRender</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">SimRender.sofa.local.factory</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for SimRender.sofa.local.factory</h1><div class="highlight"><pre>
+<span></span><span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">List</span><span class="p">,</span> <span class="n">Union</span><span class="p">,</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Callable</span>
+<span class="kn">import</span> <span class="nn">Sofa</span>
+<span class="kn">from</span> <span class="nn">numpy</span> <span class="kn">import</span> <span class="n">array</span><span class="p">,</span> <span class="n">ndarray</span><span class="p">,</span> <span class="n">nan</span><span class="p">,</span> <span class="n">tile</span>
+
+<span class="kn">from</span> <span class="nn">SimRender.core.local.factory</span> <span class="kn">import</span> <span class="n">Factory</span> <span class="k">as</span> <span class="n">_Factory</span><span class="p">,</span> <span class="n">Objects</span> <span class="k">as</span> <span class="n">_Objects</span>
+<span class="kn">from</span> <span class="nn">SimRender.sofa.local.scene_graph</span> <span class="kn">import</span> <span class="n">SceneGraph</span>
+<span class="kn">from</span> <span class="nn">SimRender.sofa.local.sofa_objects</span> <span class="kn">import</span> <span class="n">collection</span><span class="p">,</span> <span class="n">Object</span>
+
+
+<span class="k">class</span> <span class="nc">Factory</span><span class="p">(</span><span class="n">_Factory</span><span class="p">):</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">root_node</span><span class="p">:</span> <span class="n">Sofa</span><span class="o">.</span><span class="n">Core</span><span class="o">.</span><span class="n">Node</span><span class="p">,</span> <span class="n">sync</span><span class="p">:</span> <span class="nb">bool</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        This class is used to create and update the visualization data in shared memories.</span>
+
+<span class="sd">        :param root_node: Root node of the SOFA scene graph</span>
+<span class="sd">        :param sync: If True, the update call is synchronized with the end of the remote rendering step.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">sync</span><span class="o">=</span><span class="n">sync</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">objects</span> <span class="o">=</span> <span class="n">Objects</span><span class="p">(</span><span class="n">root_node</span><span class="o">=</span><span class="n">root_node</span><span class="p">,</span> <span class="n">factory</span><span class="o">=</span><span class="bp">self</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">callbacks</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="n">Object</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
+
+    <span class="k">def</span> <span class="nf">update</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+
+        <span class="k">for</span> <span class="n">idx</span><span class="p">,</span> <span class="n">data_wrapper</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">callbacks</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="n">func</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="fm">__getattribute__</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;update_</span><span class="si">{</span><span class="n">data_wrapper</span><span class="o">.</span><span class="n">object_type</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+            <span class="n">func</span><span class="p">(</span><span class="n">idx</span><span class="p">,</span> <span class="o">**</span><span class="n">data_wrapper</span><span class="o">.</span><span class="n">update</span><span class="p">())</span>
+
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">update</span><span class="p">()</span>
+
+
+<div class="viewcode-block" id="Objects">
+<a class="viewcode-back" href="../../../../api.html#SimRender.sofa.local.factory.Objects">[docs]</a>
+<span class="k">class</span> <span class="nc">Objects</span><span class="p">(</span><span class="n">_Objects</span><span class="p">):</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">root_node</span><span class="p">:</span> <span class="n">Sofa</span><span class="o">.</span><span class="n">Core</span><span class="o">.</span><span class="n">Node</span><span class="p">,</span> <span class="n">factory</span><span class="p">:</span> <span class="n">Factory</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        This class gathers the methods to create and update visual objects.</span>
+
+<span class="sd">        :param factory: Factory that handles the objects.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">factory</span><span class="o">=</span><span class="n">factory</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">__factory</span> <span class="o">=</span> <span class="n">factory</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__scene_graph</span> <span class="o">=</span> <span class="n">SceneGraph</span><span class="p">(</span><span class="n">root_node</span><span class="o">=</span><span class="n">root_node</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__SOFA_OBJECTS</span> <span class="o">=</span> <span class="n">collection</span><span class="p">()</span>
+
+<div class="viewcode-block" id="Objects.add_sofa_mesh">
+<a class="viewcode-back" href="../../../../api.html#SimRender.sofa.local.factory.Objects.add_sofa_mesh">[docs]</a>
+    <span class="k">def</span> <span class="nf">add_sofa_mesh</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
+                      <span class="n">positions_data</span><span class="p">:</span> <span class="n">Sofa</span><span class="o">.</span><span class="n">Core</span><span class="o">.</span><span class="n">Data</span><span class="p">,</span>
+                      <span class="n">cells_data</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">Sofa</span><span class="o">.</span><span class="n">Core</span><span class="o">.</span><span class="n">Data</span><span class="p">,</span> <span class="n">List</span><span class="p">[</span><span class="n">Sofa</span><span class="o">.</span><span class="n">Core</span><span class="o">.</span><span class="n">Data</span><span class="p">]],</span>
+                      <span class="n">color</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;green&#39;</span><span class="p">,</span>
+                      <span class="n">alpha</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">1.</span><span class="p">,</span>
+                      <span class="n">wireframe</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+                      <span class="n">line_width</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">1.</span><span class="p">,</span>
+                      <span class="n">colormap</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;jet&#39;</span><span class="p">,</span>
+                      <span class="n">colormap_range</span><span class="p">:</span> <span class="n">ndarray</span> <span class="o">=</span> <span class="n">array</span><span class="p">(</span><span class="n">nan</span><span class="p">),</span>
+                      <span class="n">colormap_function</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Callable</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Add a new mesh object in the viewer and record it automatically using the SOFA Data fields.</span>
+
+<span class="sd">        :param positions_data: SOFA Data field containing the positions of the mesh.</span>
+<span class="sd">        :param cells_data: SOFA Data field(s) containing the faces of the mesh.</span>
+<span class="sd">        :param color: Color of the mesh.</span>
+<span class="sd">        :param alpha: Opacity of the mesh.</span>
+<span class="sd">        :param wireframe: If True, the mesh has a wireframe representation.</span>
+<span class="sd">        :param line_width: Width of the mesh edges.</span>
+<span class="sd">        :param colormap: Color map scheme name.</span>
+<span class="sd">        :param colormap_range: Range of the color map.</span>
+<span class="sd">        :param colormap_function: Function to compute at each time step the scalar values to color the mesh regarding</span>
+<span class="sd">                                  the color map.</span>
+<span class="sd">        :return: ID of the object in the viewer.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="c1"># Positions data</span>
+        <span class="n">positions</span> <span class="o">=</span> <span class="n">positions_data</span><span class="o">.</span><span class="n">array</span><span class="p">()</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">positions</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Data contains an empty positions array.&quot;</span><span class="p">)</span>
+
+        <span class="c1"># Cells data</span>
+        <span class="n">cells</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">cells_data</span> <span class="o">=</span> <span class="n">cells_data</span> <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">cells_data</span><span class="p">,</span> <span class="nb">list</span><span class="p">)</span> <span class="k">else</span> <span class="p">[</span><span class="n">cells_data</span><span class="p">]</span>
+        <span class="k">for</span> <span class="n">data</span> <span class="ow">in</span> <span class="n">cells_data</span><span class="p">:</span>
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">array</span><span class="p">())</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="n">cells</span> <span class="o">+=</span> <span class="n">data</span><span class="o">.</span><span class="n">array</span><span class="p">()</span><span class="o">.</span><span class="n">tolist</span><span class="p">()</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">cells</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Data contains empty topology arrays.&quot;</span><span class="p">)</span>
+
+        <span class="k">class</span> <span class="nc">DataWrapper</span><span class="p">:</span>
+            <span class="n">object_type</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;mesh&#39;</span>
+
+            <span class="k">def</span> <span class="nf">update</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+                <span class="k">return</span> <span class="p">{</span><span class="s1">&#39;positions&#39;</span><span class="p">:</span> <span class="n">positions_data</span><span class="o">.</span><span class="n">array</span><span class="p">()</span><span class="o">.</span><span class="n">copy</span><span class="p">(),</span>
+                        <span class="s1">&#39;colormap_field&#39;</span><span class="p">:</span> <span class="kc">None</span> <span class="k">if</span> <span class="n">colormap_function</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">colormap_function</span><span class="p">()}</span>
+
+        <span class="c1"># Create the mesh and add the data wrapper callback</span>
+        <span class="n">idx</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">add_mesh</span><span class="p">(</span><span class="n">positions</span><span class="o">=</span><span class="n">positions_data</span><span class="o">.</span><span class="n">array</span><span class="p">()</span><span class="o">.</span><span class="n">copy</span><span class="p">(),</span>
+                            <span class="n">cells</span><span class="o">=</span><span class="n">cells</span><span class="p">,</span>
+                            <span class="n">color</span><span class="o">=</span><span class="n">color</span><span class="p">,</span>
+                            <span class="n">alpha</span><span class="o">=</span><span class="n">alpha</span><span class="p">,</span>
+                            <span class="n">wireframe</span><span class="o">=</span><span class="n">wireframe</span><span class="p">,</span>
+                            <span class="n">line_width</span><span class="o">=</span><span class="n">line_width</span><span class="p">,</span>
+                            <span class="n">colormap</span><span class="o">=</span><span class="n">colormap</span><span class="p">,</span>
+                            <span class="n">colormap_range</span><span class="o">=</span><span class="n">colormap_range</span><span class="p">,</span>
+                            <span class="n">colormap_field</span><span class="o">=</span><span class="n">colormap_function</span><span class="p">()</span> <span class="k">if</span> <span class="n">colormap_function</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">array</span><span class="p">(</span><span class="n">nan</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__factory</span><span class="o">.</span><span class="n">callbacks</span><span class="p">[</span><span class="n">idx</span><span class="p">]</span> <span class="o">=</span> <span class="n">DataWrapper</span><span class="p">()</span>
+
+        <span class="k">return</span> <span class="n">idx</span></div>
+
+
+<div class="viewcode-block" id="Objects.add_sofa_points">
+<a class="viewcode-back" href="../../../../api.html#SimRender.sofa.local.factory.Objects.add_sofa_points">[docs]</a>
+    <span class="k">def</span> <span class="nf">add_sofa_points</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
+                        <span class="n">positions_data</span><span class="p">:</span> <span class="n">Sofa</span><span class="o">.</span><span class="n">Core</span><span class="o">.</span><span class="n">Data</span><span class="p">,</span>
+                        <span class="n">color</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;green&#39;</span><span class="p">,</span>
+                        <span class="n">alpha</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">1.</span><span class="p">,</span>
+                        <span class="n">point_size</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">4</span><span class="p">,</span>
+                        <span class="n">colormap</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;jet&#39;</span><span class="p">,</span>
+                        <span class="n">colormap_range</span><span class="p">:</span> <span class="n">ndarray</span> <span class="o">=</span> <span class="n">array</span><span class="p">(</span><span class="n">nan</span><span class="p">),</span>
+                        <span class="n">colormap_function</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Callable</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Add a new point cloud in the viewer and record it automatically using the SOFA Data fields.</span>
+
+<span class="sd">        :param positions_data: SOFA Data field containing the positions of the points.</span>
+<span class="sd">        :param color: Color of the point cloud.</span>
+<span class="sd">        :param alpha: Opacity of the point cloud.</span>
+<span class="sd">        :param point_size: Size of points.</span>
+<span class="sd">        :param colormap: Color map scheme name.</span>
+<span class="sd">        :param colormap_range: Range of the color map.</span>
+<span class="sd">        :param colormap_function: Function to compute at each time step the scalar values to color the points regarding</span>
+<span class="sd">                                  the color map.</span>
+<span class="sd">        :return: ID of the object in the viewer.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="c1"># Positions data</span>
+        <span class="n">positions</span> <span class="o">=</span> <span class="n">positions_data</span><span class="o">.</span><span class="n">array</span><span class="p">()</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">positions</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Data contains an empty positions array.&quot;</span><span class="p">)</span>
+
+        <span class="k">class</span> <span class="nc">DataWrapper</span><span class="p">:</span>
+            <span class="n">object_type</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;points&#39;</span>
+
+            <span class="k">def</span> <span class="nf">update</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+                <span class="k">return</span> <span class="p">{</span><span class="s1">&#39;positions&#39;</span><span class="p">:</span> <span class="n">positions_data</span><span class="o">.</span><span class="n">array</span><span class="p">()</span><span class="o">.</span><span class="n">copy</span><span class="p">(),</span>
+                        <span class="s1">&#39;colormap_field&#39;</span><span class="p">:</span> <span class="kc">None</span> <span class="k">if</span> <span class="n">colormap_function</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">colormap_function</span><span class="p">()}</span>
+
+        <span class="c1"># Create the points and add the data wrapper callback</span>
+        <span class="n">idx</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">add_points</span><span class="p">(</span><span class="n">positions</span><span class="o">=</span><span class="n">positions_data</span><span class="o">.</span><span class="n">array</span><span class="p">()</span><span class="o">.</span><span class="n">copy</span><span class="p">(),</span>
+                              <span class="n">color</span><span class="o">=</span><span class="n">color</span><span class="p">,</span>
+                              <span class="n">alpha</span><span class="o">=</span><span class="n">alpha</span><span class="p">,</span>
+                              <span class="n">point_size</span><span class="o">=</span><span class="n">point_size</span><span class="p">,</span>
+                              <span class="n">colormap</span><span class="o">=</span><span class="n">colormap</span><span class="p">,</span>
+                              <span class="n">colormap_range</span><span class="o">=</span><span class="n">colormap_range</span><span class="p">,</span>
+                              <span class="n">colormap_field</span><span class="o">=</span><span class="n">colormap_function</span><span class="p">()</span> <span class="k">if</span> <span class="n">colormap_function</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">array</span><span class="p">(</span><span class="n">nan</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__factory</span><span class="o">.</span><span class="n">callbacks</span><span class="p">[</span><span class="n">idx</span><span class="p">]</span> <span class="o">=</span> <span class="n">DataWrapper</span><span class="p">()</span>
+
+        <span class="k">return</span> <span class="n">idx</span></div>
+
+
+<div class="viewcode-block" id="Objects.add_sofa_arrows">
+<a class="viewcode-back" href="../../../../api.html#SimRender.sofa.local.factory.Objects.add_sofa_arrows">[docs]</a>
+    <span class="k">def</span> <span class="nf">add_sofa_arrows</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
+                        <span class="n">positions_data</span><span class="p">:</span> <span class="n">Sofa</span><span class="o">.</span><span class="n">Core</span><span class="o">.</span><span class="n">Data</span><span class="p">,</span>
+                        <span class="n">vectors_data</span><span class="p">:</span> <span class="n">Sofa</span><span class="o">.</span><span class="n">Core</span><span class="o">.</span><span class="n">Data</span><span class="p">,</span>
+                        <span class="n">color</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;green&#39;</span><span class="p">,</span>
+                        <span class="n">alpha</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">1.</span><span class="p">,</span>
+                        <span class="n">colormap</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;jet&#39;</span><span class="p">,</span>
+                        <span class="n">colormap_range</span><span class="p">:</span> <span class="n">ndarray</span> <span class="o">=</span> <span class="n">array</span><span class="p">(</span><span class="n">nan</span><span class="p">),</span>
+                        <span class="n">colormap_function</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Callable</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Add a new point cloud in the viewer.</span>
+
+<span class="sd">        :param positions_data: SOFA Data field containing the positions of the arrows bases.</span>
+<span class="sd">        :param vectors_data: SOFA Data field containing the vectors of the arrows.</span>
+<span class="sd">        :param color: Color of the arrows.</span>
+<span class="sd">        :param alpha: Opacity of the arrows.</span>
+<span class="sd">        :param colormap: Color map scheme name.</span>
+<span class="sd">        :param colormap_range: Range of the color map.</span>
+<span class="sd">        :param colormap_function: Function to compute at each time step the scalar values to color the arrows regarding</span>
+<span class="sd">                                  the color map.</span>
+<span class="sd">        :return: ID of the object in the viewer.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="c1"># Positions data</span>
+        <span class="n">positions</span> <span class="o">=</span> <span class="n">positions_data</span><span class="o">.</span><span class="n">array</span><span class="p">()</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">positions</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Data contains an empty positions array.&quot;</span><span class="p">)</span>
+
+        <span class="c1"># Vectors data</span>
+        <span class="n">vectors</span> <span class="o">=</span> <span class="n">vectors_data</span><span class="o">.</span><span class="n">array</span><span class="p">()</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">vectors</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Data contains an empty  vectors array.&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">vectors</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="n">vectors</span> <span class="o">=</span> <span class="n">tile</span><span class="p">(</span><span class="n">vectors</span><span class="p">,</span> <span class="n">positions</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">3</span><span class="p">)</span>
+
+        <span class="k">class</span> <span class="nc">DataWrapper</span><span class="p">:</span>
+            <span class="n">object_type</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;arrows&#39;</span>
+
+            <span class="k">def</span> <span class="nf">update</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+                <span class="k">return</span> <span class="p">{</span><span class="s1">&#39;positions&#39;</span><span class="p">:</span> <span class="n">positions_data</span><span class="o">.</span><span class="n">array</span><span class="p">()</span><span class="o">.</span><span class="n">copy</span><span class="p">(),</span>
+                        <span class="s1">&#39;vectors&#39;</span><span class="p">:</span> <span class="n">vectors_data</span><span class="o">.</span><span class="n">array</span><span class="p">()</span><span class="o">.</span><span class="n">copy</span><span class="p">(),</span>
+                        <span class="s1">&#39;colormap_field&#39;</span><span class="p">:</span> <span class="kc">None</span> <span class="k">if</span> <span class="n">colormap_function</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">colormap_function</span><span class="p">()}</span>
+
+        <span class="c1"># Create the arrows and add the data wrapper callback</span>
+        <span class="n">idx</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">add_arrows</span><span class="p">(</span><span class="n">positions</span><span class="o">=</span><span class="n">positions_data</span><span class="o">.</span><span class="n">array</span><span class="p">()</span><span class="o">.</span><span class="n">copy</span><span class="p">(),</span>
+                              <span class="n">vectors</span><span class="o">=</span><span class="n">vectors</span><span class="p">,</span>
+                              <span class="n">color</span><span class="o">=</span><span class="n">color</span><span class="p">,</span>
+                              <span class="n">alpha</span><span class="o">=</span><span class="n">alpha</span><span class="p">,</span>
+                              <span class="n">colormap</span><span class="o">=</span><span class="n">colormap</span><span class="p">,</span>
+                              <span class="n">colormap_range</span><span class="o">=</span><span class="n">colormap_range</span><span class="p">,</span>
+                              <span class="n">colormap_field</span><span class="o">=</span><span class="n">colormap_function</span><span class="p">()</span> <span class="k">if</span> <span class="n">colormap_function</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">array</span><span class="p">(</span><span class="n">nan</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__factory</span><span class="o">.</span><span class="n">callbacks</span><span class="p">[</span><span class="n">idx</span><span class="p">]</span> <span class="o">=</span> <span class="n">DataWrapper</span><span class="p">()</span>
+
+        <span class="k">return</span> <span class="n">idx</span></div>
+
+
+    <span class="k">def</span> <span class="nf">add_sofa_object</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sofa_object</span><span class="p">:</span> <span class="n">Sofa</span><span class="o">.</span><span class="n">Core</span><span class="o">.</span><span class="n">Object</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Create a 3D object automatically from the Data fields of a SOFA Object.</span>
+<span class="sd">        It will work only if the representation of this component is implemented.</span>
+
+<span class="sd">        :param sofa_object: SOFA Object to render in the viewer.</span>
+<span class="sd">        :return: ID of the object in the viewer.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="c1"># Check if the component is implemented</span>
+        <span class="n">object_class</span> <span class="o">=</span> <span class="n">sofa_object</span><span class="o">.</span><span class="n">getClassName</span><span class="p">()</span>
+        <span class="k">if</span> <span class="n">object_class</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">__SOFA_OBJECTS</span><span class="p">:</span>
+
+            <span class="n">data_wrapper</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__SOFA_OBJECTS</span><span class="p">[</span><span class="n">object_class</span><span class="p">](</span><span class="n">sofa_object</span><span class="o">=</span><span class="n">sofa_object</span><span class="p">)</span>
+            <span class="n">func</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="fm">__getattribute__</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;add_</span><span class="si">{</span><span class="n">data_wrapper</span><span class="o">.</span><span class="n">object_type</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+            <span class="n">idx</span> <span class="o">=</span> <span class="n">func</span><span class="p">(</span><span class="o">**</span><span class="n">data_wrapper</span><span class="o">.</span><span class="n">create</span><span class="p">())</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">__factory</span><span class="o">.</span><span class="n">callbacks</span><span class="p">[</span><span class="n">idx</span><span class="p">]</span> <span class="o">=</span> <span class="n">data_wrapper</span>
+            <span class="k">return</span> <span class="n">idx</span>
+
+        <span class="k">else</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;WARNING: Could not create a 3D object for this component as the class representation is not&quot;</span>
+                  <span class="sa">f</span><span class="s2">&quot;implemented. Available components are </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">__SOFA_OBJECTS</span><span class="o">.</span><span class="n">keys</span><span class="p">()</span><span class="si">}</span><span class="s2">.&quot;</span><span class="p">)</span>
+
+<div class="viewcode-block" id="Objects.add_scene_graph">
+<a class="viewcode-back" href="../../../../api.html#SimRender.sofa.local.factory.Objects.add_scene_graph">[docs]</a>
+    <span class="k">def</span> <span class="nf">add_scene_graph</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
+                        <span class="n">visual_models</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+                        <span class="n">behavior_models</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+                        <span class="n">force_fields</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+                        <span class="n">collision_models</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        The whole SOFA scene graph is explored to create visual objects automatically.</span>
+
+<span class="sd">        :param visual_models: If True, display each detected visual model in the scene graph.</span>
+<span class="sd">        :param behavior_models: If True, display each detected behavior model in the scene graph.</span>
+<span class="sd">        :param force_fields: If True, display each detected force field in the scene graph.</span>
+<span class="sd">        :param collision_models: If True, display each detected collision model in the scene graph.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">display_models</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;visual_model&#39;</span><span class="p">:</span> <span class="n">visual_models</span><span class="p">,</span> <span class="s1">&#39;behavior_model&#39;</span><span class="p">:</span> <span class="n">behavior_models</span><span class="p">,</span>
+                          <span class="s1">&#39;force_field&#39;</span><span class="p">:</span> <span class="n">force_fields</span><span class="p">,</span> <span class="s1">&#39;collision_model&#39;</span><span class="p">:</span> <span class="n">collision_models</span><span class="p">}</span>
+
+        <span class="c1"># Process each sofa object in the scene graph</span>
+        <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">sofa_object</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">__scene_graph</span><span class="o">.</span><span class="n">graph</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+
+            <span class="c1"># Key format: root.child1...childN.@.Component&lt;name&gt;</span>
+            <span class="n">object_class</span> <span class="o">=</span> <span class="n">key</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;@.&#39;</span><span class="p">)[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;&lt;&#39;</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+
+            <span class="c1"># Handle the VisualStyle object</span>
+            <span class="k">if</span> <span class="n">object_class</span> <span class="o">==</span> <span class="s1">&#39;VisualStyle&#39;</span><span class="p">:</span>
+                <span class="n">display_flags</span> <span class="o">=</span> <span class="n">sofa_object</span><span class="o">.</span><span class="n">displayFlags</span><span class="o">.</span><span class="n">value</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;  &#39;</span><span class="p">)</span>
+                <span class="c1"># TODO: apply the display flags</span>
+
+            <span class="c1"># Check if a configuration exists for the object</span>
+            <span class="k">elif</span> <span class="n">object_class</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">__SOFA_OBJECTS</span><span class="p">:</span>
+                <span class="n">data_wrapper</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__SOFA_OBJECTS</span><span class="p">[</span><span class="n">object_class</span><span class="p">](</span><span class="n">sofa_object</span><span class="o">=</span><span class="n">sofa_object</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">display_models</span><span class="p">[</span><span class="n">data_wrapper</span><span class="o">.</span><span class="n">display_model</span><span class="p">]:</span>
+                    <span class="n">func</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="fm">__getattribute__</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;add_</span><span class="si">{</span><span class="n">data_wrapper</span><span class="o">.</span><span class="n">object_type</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+                    <span class="n">idx</span> <span class="o">=</span> <span class="n">func</span><span class="p">(</span><span class="o">**</span><span class="n">data_wrapper</span><span class="o">.</span><span class="n">create</span><span class="p">())</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">__factory</span><span class="o">.</span><span class="n">callbacks</span><span class="p">[</span><span class="n">idx</span><span class="p">]</span> <span class="o">=</span> <span class="n">data_wrapper</span></div>
+</div>
+
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2024, Mimesis, Inria.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>
