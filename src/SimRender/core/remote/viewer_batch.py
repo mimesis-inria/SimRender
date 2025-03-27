@@ -61,6 +61,7 @@ class ViewerBatch(QMainWindow):
             self.plt.remove(self.active_factory.vedo_objects)
             self.active_factory = self.factories[idx]
             self.plt.add(self.active_factory.vedo_objects)
+            self.plt.render()
 
     def time_step(self, _) -> None:
         """
